@@ -5,7 +5,7 @@ class Wall extends GameObject{
     this.collider = new RectCollider();
   }
 
-  this.setSize = function(width, height) {
+  setSize = function(width, height) {
     this.collider.size.width = width;
     this.collider.size.height = height;
 

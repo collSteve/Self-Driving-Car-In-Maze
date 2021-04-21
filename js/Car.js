@@ -1,7 +1,7 @@
 class Car extends GameObject {
-  this.startPosition = createVector(0,0);
+  startPosition = createVector(0,0);
 
-  this.maxSpeed = 0; // set up later
+  maxSpeed = 0; // set up later
 
   constructor(pos) {
     this.position = pos.copy();
@@ -11,7 +11,7 @@ class Car extends GameObject {
     this.collider = new RectCollider();
   }
 
-  this.setSize = function(width, height) {
+  setSize = function(width, height) {
     this.collider.size.width = width;
     this.collider.size.height = height;
 

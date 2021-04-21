@@ -6,13 +6,13 @@ const MotionType = {
 
 // dependence: P5.js Vector
 class GameObject {
-  this.position = createVector(0,0);
-  this.rotation = createVector(0,0);
+  position = createVector(0,0);
+  rotation = createVector(0,0);
 
-  this.motionType = MotionType.Static;
+  motionType = MotionType.Static;
 
-  this.sprite = new Sprite();
-  this.collider = new Collider();
+  sprite = new Sprite();
+  collider = new Collider();
 
   moveTo = function(newPos) {
     if (this.motionType != MotionType.Static ) {
@@ -22,7 +22,7 @@ class GameObject {
 
   moveBy = function(moveVector) {
     if (this.motionType != MotionType.Static ) {
-      this.position = p5.Vector.add(this.position, moveVector)
+      this.position = p5.Vector.add(this.position, moveVector);
     }
   }
 }
