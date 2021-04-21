@@ -1,0 +1,4 @@
+class Maze {
+  this.maze = [];
+  
+}

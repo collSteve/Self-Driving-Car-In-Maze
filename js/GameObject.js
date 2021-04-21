@@ -11,7 +11,7 @@ class GameObject {
 
   this.motionType = MotionType.Static;
 
-  this.Sprite = new Sprite();
+  this.sprite = new Sprite();
   this.collider = new Collider();
 
   moveTo = function(newPos) {
