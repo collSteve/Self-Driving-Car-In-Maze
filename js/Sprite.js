@@ -5,6 +5,6 @@ const SpriteType = {
 }
 
 class Sprite {
-  spriteType = null;
+  spriteType = SpriteType.Rect;
   size = {width:0, height:0}; //default
 }

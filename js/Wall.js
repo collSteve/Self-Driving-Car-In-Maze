@@ -1,7 +1,10 @@
 class Wall extends GameObject{
-  constructor(pos) {
+  constructor(pos, width=0, height=0, rotation=0) {
     super();
     this.position = pos.copy();
+    this.setSize(width, height);
+    this.rotation = rotation;
+
     this.tag = "Wall";
 
     this.sprite.spriteType = SpriteType.Rect;

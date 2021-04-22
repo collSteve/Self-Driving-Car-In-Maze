@@ -9,6 +9,7 @@ class Car extends GameObject {
     this.startPosition = pos.copy();
 
     this.tag = "Car";
+    this.motionType = MotionType.Kinematic;
 
     this.sprite.spriteType = SpriteType.Rect;
     this.collider = new RectCollider();
