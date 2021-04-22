@@ -5,6 +5,6 @@ const SpriteType = {
 }
 
 class Sprite {
-  this.spriteType = null;
-  this.size = {width:0, height:0}; //default
+  spriteType = null;
+  size = {width:0, height:0}; //default
 }

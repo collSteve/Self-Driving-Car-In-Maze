@@ -1,4 +1,4 @@
 class Maze {
-  this.maze = [];
-  
+  maze = [];
+
 }
