@@ -4,6 +4,7 @@ class Car extends GameObject {
   maxSpeed = 0; // set up later
 
   constructor(pos) {
+    super();
     this.position = pos.copy();
     this.startPosition = pos.copy();
 
