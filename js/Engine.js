@@ -1,8 +1,11 @@
 class Engine {
-  gameMaze = new Maze();
+  gameMaze;
   gameObjects = [];
 
-  constructor() {
+  constructor(gameMaze=new Maze()) {
+    this.gameMaze = gameMaze;
+
+    this.gameObjects = gameMaze.maze.concat([]); // better implement deep copy later
   }
 
   run = function() {
@@ -10,19 +13,32 @@ class Engine {
   }
 
   displayGameObjects = function(objects) {
-
     // p5 js drawing
+    rectMode(CENTER);
     objects.forEach((item, i) => {
       let pos = item.position.copy();
       let size = item.sprite.size;
 
+      push();
+      translate(pos.x, pos.y); // translate to sprite's position
+      rotate(item.sprite.rotation); // rotate the sprite
+
+      // set colorProperty
+      fill(item.sprite.colorProperty.fill);
+      stroke(item.sprite.colorProperty.stroke);
+
       if (item.sprite.spriteType == SpriteType.Rect) {
-        rect(pos.x, pos.y, size.width, size.height);
+        rect(0, 0, size.width, size.height);
       }
       else if (item.sprite.spriteType == SpriteType.Ellipse) {
-        ellipse(pos.x, pos.y, size.width, size.height);
+        ellipse(0, 0, size.width, size.height);
       }
-    });
 
+      pop();
+    });
+  }
+
+  addGameObject = function(obj) {
+    this.gameObjects.push(obj);
   }
 }

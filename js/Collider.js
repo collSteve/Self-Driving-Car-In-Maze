@@ -1,5 +1,6 @@
 class Collider {
   size = {width:0, height:0};
+  rotation = 0;
 
   isTrigger = false;
 }
