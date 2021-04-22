@@ -2,6 +2,8 @@ class Wall extends GameObject{
   constructor(pos) {
     super();
     this.position = pos.copy();
+    this.tag = "Wall";
+
     this.sprite.spriteType = SpriteType.Rect;
     this.collider = new RectCollider();
   }

@@ -11,6 +11,8 @@ class GameObject {
 
   motionType = MotionType.Static;
 
+  tag = "None"; // tag for distinguishing game objects
+
   sprite = new Sprite();
   collider = new Collider();
 
