@@ -7,7 +7,7 @@ const MotionType = {
 // dependence: P5.js Vector
 class GameObject {
   position = createVector(0,0);
-  rotation = createVector(0,0);
+  rotation = 0;
 
   motionType = MotionType.Static;
 
