@@ -1,10 +1,10 @@
 let GameEngine, GameMaze, GameCar;
 
 function setup() {
-  createCanvas(400, 400);
+  createCanvas(500, 500);
   GameMaze = new Maze();
 
-  GameCar = new Car(createVector(0,0), 20,20,0);
+  GameCar = new Car(createVector(250,450), 20, 20, Math.PI/2);
   GameCar.sprite.colorProperty.fill = "blue";
   GameCar.sprite.colorProperty.stroke = "white";
 
