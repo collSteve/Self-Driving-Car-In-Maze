@@ -8,7 +8,7 @@ class Car extends GameObject {
     this.position = pos.copy();
     this.startPosition = pos.copy();
 
-    this.rotation = rotation;
+
     this.tag = "Car";
     this.motionType = MotionType.Kinematic;
 
@@ -26,6 +26,7 @@ class Car extends GameObject {
     this.sprite.size.height = height;
     this.sprite.rotation = rotation;
 
+    this.rotation = rotation;
   }
 
 }

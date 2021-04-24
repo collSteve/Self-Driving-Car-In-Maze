@@ -22,6 +22,7 @@ class Maze {
       rotation = 0; //????, not Math.PI / 2; ??
     }
 
+
     let wall = new Wall(createVector(centerX, centerY), width, height, rotation);
     return wall;
   }
