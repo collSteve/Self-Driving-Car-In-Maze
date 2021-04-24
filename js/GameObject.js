@@ -29,7 +29,13 @@ class GameObject {
     }
   }
 
+  setRotation = function(angle) {
+    this.rotation = angle;
+    this.sprite.rotation = angle;
+    this.collider.rotation = angle;
+  }
+
   update = function(deltaTime) {
-    
+
   }
 }
