@@ -31,7 +31,7 @@ class Car extends GameObject {
 
   // public interface
   update = function(deltaTime) {
-    let motionProperty = {speed:5, direction:createVector(-1,-2)};
+    let motionProperty = {speed:5, direction:createVector(0,-2)};
 
     this.move(motionProperty.speed, motionProperty.direction, deltaTime);
 

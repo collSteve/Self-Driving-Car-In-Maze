@@ -6,58 +6,35 @@ class Maze {
   }
 
   /**
-   * Translates cartesian to polar dimensions and calls wall constructor
-   * Only for strcitly vertical/horizontal walls
-   * Returns constructed wall
+   * Translates cartesian to polar dimensions and calls wall constructor, then pushes constructed wall to maze
    */
-  createWall = function(pt1x, pt1y, pt2x, pt2y) {
+  straightThinWall = function(pt1x, pt1y, pt2x, pt2y) {
     let centerX = (pt1x + pt2x) / 2;
     let centerY = (pt1y + pt2y) / 2;
+    let xDist = pt1x - pt2x;
+    let yDist = pt1y - pt2y;
 
-    let width = Math.abs(pt1x - pt2x) + 10;
-    let height = Math.abs(pt1y - pt2y) + 10;
 
-    let rotation = 0;
-    if (pt1x == pt2x) {
-      rotation = 0; //????, not Math.PI / 2; ??
-    }
-
+    let height = 10;
+    let rotation = Math.atan2(yDist, xDist);
+    let width = Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) + height; //distance bw points + 10 (padding)
 
     let wall = new Wall(createVector(centerX, centerY), width, height, rotation);
-    return wall;
-  }
-
- /**
-  * Obtains wall coordinates from given list and applies createWall() function on each, then pushes constructed wall to maze
-  */
-  createWallsFrom = function(list) {
-    for (let coords of list) {
-      let wall = this.createWall(coords[0], coords[1], coords[2], coords[3]);
-      this.maze.push(wall);
-    }
+    this.maze.push(wall);
   }
 
   initializeMaze = function() {
-    // Preserved for debugging purposes
-    // let wall1 = new Wall(createVector(100,50), 100, 20);
-    // let wall2 = new Wall(createVector(100,50), 100, 20, Math.PI/2);
-    // let wall3 = new Wall(createVector(250,350), 100, 20);
-    // let wall4 = new Wall(createVector(300,300), 100, 20, -Math.PI/4);
-    //
-    // this.maze.push(wall1);
-    // this.maze.push(wall2);
-    // this.maze.push(wall3);
-    // this.maze.push(wall4);
-
     // Default boundaries and walls
-    let boundaryCoords = [
+    let defaultWallCoords = [
+        [0, 0, 100, 50], // show case inclined wall
+        //Boundary
         [0, 0, 500, 0],
         [0, 0, 0, 500],
         [500, 0, 500, 500],
         [0, 500, 200, 500],
-        [500, 500, 300, 500]
-    ];
-    let wallCoords = [
+        [500, 500, 300, 500],
+
+        //Internal
         [400, 0, 400, 200],
         [100, 100, 300, 100],
         [0, 200, 100, 200],
@@ -70,8 +47,7 @@ class Maze {
         [300, 400, 300, 500]
     ];
 
-    this.createWallsFrom(boundaryCoords);
-    this.createWallsFrom(wallCoords);
+    defaultWallCoords.forEach(wall => this.straightThinWall(wall[0], wall[1], wall[2], wall[3]));
 
   }
 
