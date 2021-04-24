@@ -16,12 +16,13 @@ class GameObject {
   sprite = new Sprite();
   collider = new Collider();
 
+  // newPos is a vector
   moveTo = function(newPos) {
     if (this.motionType != MotionType.Static ) {
       this.position = newPos;
     }
   }
-
+  // moveVector is a vector
   moveBy = function(moveVector) {
     if (this.motionType != MotionType.Static ) {
       this.position = p5.Vector.add(this.position, moveVector);
