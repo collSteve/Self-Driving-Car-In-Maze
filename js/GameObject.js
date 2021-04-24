@@ -28,4 +28,8 @@ class GameObject {
       this.position = p5.Vector.add(this.position, moveVector);
     }
   }
+
+  update = function(deltaTime) {
+    
+  }
 }

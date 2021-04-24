@@ -8,7 +8,8 @@ class Engine {
     this.gameObjects = gameMaze.maze.concat([]); // better implement deep copy later
   }
 
-  run = function() {
+  run = function(deltaTime) {
+    this.updateObjects(this.gameObjects, deltaTime);
     this.displayGameObjects(this.gameObjects);
 
   }
@@ -38,6 +39,14 @@ class Engine {
 
       pop();
     });
+  }
+
+  updateObjects = function(objects, deltaTime) {
+    objects.forEach((item, i) => {
+        item.update(deltaTime/100);
+      }
+    )
+
   }
 
   addGameObject = function(obj) {

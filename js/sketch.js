@@ -15,5 +15,5 @@ function setup() {
 
 function draw() {
   background(220);
-  GameEngine.run();
+  GameEngine.run(deltaTime);
 }
