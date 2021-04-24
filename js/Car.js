@@ -34,7 +34,8 @@ class Car extends GameObject {
 
   // public interface
   update = function(deltaTime) {
-    let motionProperty = {speed:5,
+    let motionProperty = {
+      speed:5,
       direction:createVector(randomNum(-1, 1),randomNum(-1, 1))};
 
     // first turning, then moving
