@@ -10,11 +10,13 @@ class Engine {
 
   run = function() {
     this.displayGameObjects(this.gameObjects);
+
   }
 
   displayGameObjects = function(objects) {
     // p5 js drawing
     rectMode(CENTER);
+
     objects.forEach((item, i) => {
       let pos = item.position.copy();
       let size = item.sprite.size;
