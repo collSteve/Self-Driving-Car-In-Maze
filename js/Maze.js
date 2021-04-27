@@ -14,16 +14,19 @@ class Maze {
     let xDist = pt1x - pt2x;
     let yDist = pt1y - pt2y;
 
-    let height = Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) + 10; //distance bw points + 10 (padding)
-    let rotation = Math.atan(xDist/yDist);
 
-    let wall = new Wall(createVector(centerX, centerY), 10, height, rotation);
+    let height = 10;
+    let rotation = Math.atan2(yDist, xDist);
+    let width = Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) + height; //distance bw points + 10 (padding)
+
+    let wall = new Wall(createVector(centerX, centerY), width, height, rotation);
     this.maze.push(wall);
   }
 
   initializeMaze = function() {
     // Default boundaries and walls
     let defaultWallCoords = [
+        [0, 0, 100, 50], // show case inclined wall
         //Boundary
         [0, 0, 500, 0],
         [0, 0, 0, 500],

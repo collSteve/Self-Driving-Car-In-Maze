@@ -28,4 +28,14 @@ class GameObject {
       this.position = p5.Vector.add(this.position, moveVector);
     }
   }
+
+  setRotation = function(angle) {
+    this.rotation = angle;
+    this.sprite.rotation = angle;
+    this.collider.rotation = angle;
+  }
+
+  update = function(deltaTime) {
+
+  }
 }
