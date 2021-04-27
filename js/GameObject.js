@@ -8,6 +8,9 @@ const MotionType = {
 class GameObject {
   position = createVector(0,0);
   rotation = 0;
+  
+  static currID = 0;
+  ID = GameObject.currID++;
 
   motionType = MotionType.Static;
 
