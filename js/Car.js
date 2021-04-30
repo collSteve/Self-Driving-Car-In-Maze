@@ -1,8 +1,8 @@
 class Car extends GameObject {
   startPosition = createVector(0,0);
 
-  maxSpeed = 10; // set up later
-  maxTurnSpeed = 0.5;
+  maxSpeed = 5; // set up later
+  maxTurnSpeed = 0.1;
 
   headingDirection = createVector(0,-1);
 
@@ -21,6 +21,8 @@ class Car extends GameObject {
 
     // physics (matter.js)
     this.body = Matter.Bodies.rectangle(this.position.x,this.position.y, width, height);
+
+    this.body.frictionAir = 0.5; // large air friction
     this.setRotation(rotation);
   }
 
@@ -44,20 +46,30 @@ class Car extends GameObject {
     let motionProperty = {
       speed:5,
       //direction:createVector(randomNum(-1, 1),randomNum(-1, 1))
-      direction:createVector(0,-1)
+      direction:createVector(2,-1)
     };
 
-    // first turning, then moving
-    let turnAngle = Math.atan2(motionProperty.direction.y,motionProperty.direction.x)
-            - Math.atan2(this.headingDirection.y,this.headingDirection.x);
+    motionProperty.direction = motionProperty.direction.normalize();
 
-    this.turn(turnAngle, deltaTime);
-    let realMotionProperty = this.move(motionProperty.speed, deltaTime);
+    // either turn or move
+    let error = 0.01;
+    if (Math.abs(motionProperty.direction.y - this.headingDirection.y) > error ||
+        Math.abs(motionProperty.direction.x - this.headingDirection.x) > error) {
+          // turn
+      let turnAngle = Math.atan2(motionProperty.direction.y,motionProperty.direction.x)
+              - Math.atan2(this.headingDirection.y,this.headingDirection.x);
+
+      this.turn(turnAngle, deltaTime);
+    }
+    else {
+      this.move(motionProperty.speed, deltaTime);
+    }
+    //let realMotionProperty = this.move(motionProperty.speed, deltaTime);
 
     // generation output data for the change
-    let updateProperty = {motionProperty:realMotionProperty};
+    //let updateProperty = {motionProperty:realMotionProperty};
 
-    return updateProperty;
+    //return updateProperty;
   }
 
   // v is a float, direction is a vector
@@ -73,11 +85,14 @@ class Car extends GameObject {
     }
 
     ///let moveVector = p5.Vector.mult(direction, v*deltaTime);
-    let moveVector = p5.Vector.mult(direction, v);
+    let speedVector = {x:this.headingDirection.x * v,
+                       y:this.headingDirection.y * v};
 
     //this.moveBy(moveVector);
     // matter.js move
-    Matter.Body.setVelocity(this.body, moveVector);
+    Matter.Body.setVelocity(this.body, speedVector);
+
+    this.headingDirection = createVector(Math.cos(this.body.angle), Math.sin(this.body.angle));
 
     return {speed:v, direction:{x:direction.x, y:direction.y}};
   }
@@ -91,7 +106,7 @@ class Car extends GameObject {
     }
 
     // instant set angle (need change)
-    Matter.Body.setAngularVelocity(this.body, angularSpeed);
+    Matter.Body.setAngle(this.body, this.body.angle + angularSpeed);
 
     this.headingDirection = createVector(Math.cos(this.body.angle), Math.sin(this.body.angle));
 
