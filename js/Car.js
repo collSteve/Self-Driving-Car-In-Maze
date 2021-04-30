@@ -1,8 +1,8 @@
 class Car extends GameObject {
   startPosition = createVector(0,0);
 
-  maxSpeed = 10; // set up later
-  maxTurnSpeed = 0.3;
+  maxSpeed = 5; // set up later
+  maxTurnSpeed = 0.1;
 
   headingDirection = createVector(0,-1);
 
@@ -17,36 +17,61 @@ class Car extends GameObject {
 
     this.sprite.spriteType = SpriteType.Rect;
     this.collider = new RectCollider();
-    this.setSize(width, height, rotation);
+    this.setSize(width, height);
+
+    // physics (matter.js)
+    this.body = Matter.Bodies.rectangle(this.position.x,this.position.y, width, height);
+
+    this.body.frictionAir = 0.5; // large air friction
+    this.setRotation(rotation);
   }
 
   setSize = function(width, height, rotation) {
+    let widthRatio = width / this.collider.size.width;
+    let heightRatio = height / this.collider.size.height;
+
+
     this.collider.size.width = width;
     this.collider.size.height = height;
-    this.collider.rotation = rotation;
 
     this.sprite.size.width = width;
     this.sprite.size.height = height;
-    this.sprite.rotation = rotation;
 
-    this.rotation = rotation;
+    // reshape body (matter.js)
+  ///  Matter.Body.scale(this.body, widthRatio, heightRatio);
   }
 
   // public interface
   update = function(deltaTime) {
-    let motionProperty = {speed:5,
-      direction:createVector(randomNum(-1, 1),randomNum(-1, 1))};
+    let motionProperty = {
+      speed:5,
+      //direction:createVector(randomNum(-1, 1),randomNum(-1, 1))
+      direction:createVector(2,-1)
+    };
 
-    // first turning, then moving
+    motionProperty.direction = motionProperty.direction.normalize();
+
+    // either turn or move
+    let error = 0.01;
+
     let turnAngle = Math.atan2(motionProperty.direction.y,motionProperty.direction.x)
             - Math.atan2(this.headingDirection.y,this.headingDirection.x);
-    this.turn(turnAngle, deltaTime);
-    let realMotionProperty = this.move(motionProperty.speed, deltaTime);
+    if (Math.abs(motionProperty.direction.y - this.headingDirection.y) > error ||
+        Math.abs(motionProperty.direction.x - this.headingDirection.x) > error) {
+          // turn
+      this.turn(turnAngle, deltaTime);
+    }
+    else {
+      // turn and move
+      this.turn(turnAngle, deltaTime);
+      this.move(motionProperty.speed, deltaTime);
+    }
+    //let realMotionProperty = this.move(motionProperty.speed, deltaTime);
 
     // generation output data for the change
-    let updateProperty = {motionProperty:realMotionProperty};
+    //let updateProperty = {motionProperty:realMotionProperty};
 
-    return updateProperty;
+    //return updateProperty;
   }
 
   // v is a float, direction is a vector
@@ -61,11 +86,17 @@ class Car extends GameObject {
       v = -this.maxSpeed;
     }
 
-    let moveVector = p5.Vector.mult(direction, v*deltaTime);
+    ///let moveVector = p5.Vector.mult(direction, v*deltaTime);
+    let speedVector = {x:this.headingDirection.x * v,
+                       y:this.headingDirection.y * v};
 
-    this.moveBy(moveVector);
+    //this.moveBy(moveVector);
+    // matter.js move
+    Matter.Body.setVelocity(this.body, speedVector);
 
-    return {speed:v, direction:{x:direction.x, y:direction.y}}
+    this.headingDirection = createVector(Math.cos(this.body.angle), Math.sin(this.body.angle));
+
+    return {speed:v, direction:{x:direction.x, y:direction.y}};
   }
 
   turn = function(angularSpeed, deltaTime) {
@@ -75,15 +106,22 @@ class Car extends GameObject {
     else if (angularSpeed < -this.maxTurnSpeed) {
       angularSpeed = -this.maxTurnSpeed;
     }
-    let x = this.headingDirection.x;
-    let y = this.headingDirection.y
-    this.headingDirection.x = x*Math.cos(angularSpeed*deltaTime)-y*Math.sin(angularSpeed*deltaTime);
-    this.headingDirection.y = x*Math.sin(angularSpeed*deltaTime)+y*Math.cos(angularSpeed*deltaTime);
 
-    this.headingDirection.normalize();
+    // instant set angle (need change)
+    Matter.Body.setAngle(this.body, this.body.angle + angularSpeed);
 
-    // set Rotation
-    this.setRotation(Math.atan2(this.headingDirection.y, this.headingDirection.x));
+    this.headingDirection = createVector(Math.cos(this.body.angle), Math.sin(this.body.angle));
+
+
+    // let x = this.headingDirection.x;
+    // let y = this.headingDirection.y
+    // this.headingDirection.x = x*Math.cos(angularSpeed*deltaTime)-y*Math.sin(angularSpeed*deltaTime);
+    // this.headingDirection.y = x*Math.sin(angularSpeed*deltaTime)+y*Math.cos(angularSpeed*deltaTime);
+    //
+    // this.headingDirection.normalize();
+    //
+    // // set Rotation
+    // this.setRotation(Math.atan2(this.headingDirection.y, this.headingDirection.x));
 
   }
 
