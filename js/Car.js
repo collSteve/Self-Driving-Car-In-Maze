@@ -53,15 +53,17 @@ class Car extends GameObject {
 
     // either turn or move
     let error = 0.01;
+
+    let turnAngle = Math.atan2(motionProperty.direction.y,motionProperty.direction.x)
+            - Math.atan2(this.headingDirection.y,this.headingDirection.x);
     if (Math.abs(motionProperty.direction.y - this.headingDirection.y) > error ||
         Math.abs(motionProperty.direction.x - this.headingDirection.x) > error) {
           // turn
-      let turnAngle = Math.atan2(motionProperty.direction.y,motionProperty.direction.x)
-              - Math.atan2(this.headingDirection.y,this.headingDirection.x);
-
       this.turn(turnAngle, deltaTime);
     }
     else {
+      // turn and move
+      this.turn(turnAngle, deltaTime);
       this.move(motionProperty.speed, deltaTime);
     }
     //let realMotionProperty = this.move(motionProperty.speed, deltaTime);
