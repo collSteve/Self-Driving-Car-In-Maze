@@ -17,7 +17,7 @@ class Maze {
 
     let height = 10; // wall thickness
     let rotation = Math.atan2(yDist, xDist);
-    let width = Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) + height; //distance bw points + 10 (padding)
+    let width = Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) + height;
 
     let wall = new Wall(createVector(centerX, centerY), width, height, rotation);
     this.maze.push(wall);

@@ -10,18 +10,20 @@ class Wall extends GameObject{
     this.sprite.colorProperty.stroke = "black";
     this.collider = new RectCollider();
 
-    this.setSize(width, height, rotation);
+    this.setSize(width, height);
+
+    // physics (matter.js)
+    this.body = Matter.Bodies.rectangle(this.position.x,this.position.y, width, height, {isStatic:true});
+    this.setRotation(rotation);
   }
 
-  setSize = function(width, height, rotation) {
+  setSize = function(width, height) {
     this.collider.size.width = width;
     this.collider.size.height = height;
-    this.collider.rotation = rotation;
+    //this.collider.rotation = rotation;
 
     this.sprite.size.width = width;
     this.sprite.size.height = height;
-    this.sprite.rotation = rotation;
-    
-    this.rotation = rotation;
+    //this.sprite.rotation = rotation;
   }
 }
