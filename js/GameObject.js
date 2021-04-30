@@ -8,7 +8,11 @@ const MotionType = {
 class GameObject {
   position = createVector(0,0);
   rotation = 0;
+
   headingDirection = createVector(0,-1);
+
+  static currID = 0;
+  ID = GameObject.currID++;
 
   motionType = MotionType.Static;
 

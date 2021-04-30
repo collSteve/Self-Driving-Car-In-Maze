@@ -15,7 +15,7 @@ class Maze {
     let yDist = pt1y - pt2y;
 
 
-    let height = 10;
+    let height = 10; // wall thickness
     let rotation = Math.atan2(yDist, xDist);
     let width = Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) + height;
 
