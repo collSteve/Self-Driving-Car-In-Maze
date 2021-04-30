@@ -56,6 +56,11 @@ class Engine {
       }
 
       pop();
+
+      // draw heading direction of Car
+      if (item.tag =="Car") {
+        drawArrow(pos,p5.Vector.mult(item.headingDirection,20),"red");
+      }
     });
   }
 
