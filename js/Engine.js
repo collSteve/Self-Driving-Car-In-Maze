@@ -10,8 +10,8 @@ class Engine {
     this.physicsEngine = Matter.Engine.create();
     this.physicsEngine.world.gravity.y = 0;
     this.physicsEngineRunner = Matter.Runner.create();
-    Matter.Runner.run(this.physicsEngineRunner, this.physicsEngine)
 
+    Matter.Runner.run(this.physicsEngineRunner, this.physicsEngine);
 
     this.gameMaze = gameMaze;
 
