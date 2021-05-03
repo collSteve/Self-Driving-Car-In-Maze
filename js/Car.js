@@ -6,6 +6,8 @@ class Car extends GameObject {
 
   headingDirection = createVector(0,-1);
 
+
+
   constructor(pos, width=0, height=0, rotation=0) {
     super();
     this.position = pos.copy();
@@ -46,16 +48,17 @@ class Car extends GameObject {
     let motionProperty = {
       speed:5,
       //direction:createVector(randomNum(-1, 1),randomNum(-1, 1))
-      direction:createVector(2,-1)
+      direction:createVector(0,-1)
     };
 
     motionProperty.direction = motionProperty.direction.normalize();
 
-    // either turn or move
-    let error = 0.01;
-
     let turnAngle = Math.atan2(motionProperty.direction.y,motionProperty.direction.x)
             - Math.atan2(this.headingDirection.y,this.headingDirection.x);
+
+    // either turn or move
+    let error = 0.1;
+
     if (Math.abs(motionProperty.direction.y - this.headingDirection.y) > error ||
         Math.abs(motionProperty.direction.x - this.headingDirection.x) > error) {
           // turn
@@ -129,4 +132,53 @@ class Car extends GameObject {
 
 function randomNum(min, max) {
 	return Math.floor(Math.random() * (max - min)) + min; // You can remove the Math.floor if you don't want it to be an integer
+}
+
+// possible States:
+/*
+dataStructure:
+data =
+{
+  previousState:
+  nextState:
+  vision:
+
+}
+*/
+
+/*
+Event stateEndEvent;
+
+stateEndEvent.addlistener(Run, e);
+
+Run(e) {
+    nextSate = e.nextState;
+
+    dataOut = await nextSate(e.dataIn);
+
+    //construct new e
+    e.dataIn = dataOut;
+    e.nextSate = dataOut.nextSate;
+
+    trigger(stateEndEvent, e);
+  }
+
+const States = {
+  "State1": State1,
+  ....
+}
+
+*/
+
+async function sampleState(dataIn) { // input: {previous: State1, vision:{}, ...}
+  // input data process
+  let previousState = input.previousState;
+  // do sth
+
+  // output contruct
+  let dataOut = {};
+  let vision = {};
+  dataOut["nextState"] = State2;
+
+  return await State2(dataOut);
 }
