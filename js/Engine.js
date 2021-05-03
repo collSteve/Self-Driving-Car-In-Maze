@@ -21,7 +21,7 @@ class Engine {
   }
 
   run = function(deltaTime) {
-    this.updateObjects(this.gameObjects, deltaTime); // return a json for storing updateProperties for each item
+    //this.updateObjects(this.gameObjects, deltaTime); // return a json for storing updateProperties for each item
 
     // To-DO: Collision detector (detect collision in all gameObjects) [probably return json for colliding objects with its updateProperty]
 
