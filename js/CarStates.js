@@ -5,7 +5,11 @@ data =
   previousState:
   nextState:
   vision:
-
+  deltaTime:
+  brainDemands: {
+                  nextTargetPoint:
+                }
+  movementData:
 }
 */
 
