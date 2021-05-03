@@ -76,6 +76,9 @@ class ThinkState extends CarState {
   }
 
   async run() {
+    // data processing
+    let currentPos = this.gameObject.body.position;
+
     // To-Do: think
     console.log("Running "+ this.stateName);
 
@@ -83,7 +86,8 @@ class ThinkState extends CarState {
 
     // sample data
     demands.motionDemands = {
-      nextTargetPoint: {x: 250, y:400}
+      nextTargetPoint: {x: currentPos.x + randomNum(-80,80),
+                        y:currentPos.y + randomNum(-80,80)}
     };
 
     // output construct
@@ -154,7 +158,7 @@ class TranslationMotionState extends CarState {
   constructor(gameObject) {
     super(gameObject);
     this.stateName = "TranslationMotionState";
-    this.distanceError = 0.1;
+    this.distanceError = 5;
   }
 
   async run() {

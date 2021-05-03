@@ -53,7 +53,6 @@ class Car extends GameObject {
     // run
     let eventArg = {dataIn: initDataIn};
     EventDispatcher.emit(this.eventName, eventArg);
-    console.log("set up finished");
   }
 
   setSize = function(width, height, rotation) {
