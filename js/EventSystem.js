@@ -1,0 +1,3 @@
+var EventDispatcher = {};
+
+Emitter(EventDispatcher); 

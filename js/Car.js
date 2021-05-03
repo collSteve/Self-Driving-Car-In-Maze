@@ -1,3 +1,5 @@
+
+
 class Car extends GameObject {
   startPosition = createVector(0,0);
 
@@ -6,7 +8,9 @@ class Car extends GameObject {
 
   headingDirection = createVector(0,-1);
 
-
+  States = {
+    "Abstract State" : new CarState(this)
+  }
 
   constructor(pos, width=0, height=0, rotation=0) {
     super();
@@ -26,6 +30,22 @@ class Car extends GameObject {
 
     this.body.frictionAir = 0.5; // large air friction
     this.setRotation(rotation);
+
+    // event set up
+    this.eventName = this.tage + this.ID;
+
+    let initDataIn = {
+      previousState: null,
+      nextState: "Abstract State",
+      vision: null
+    };
+
+    EventDispatcher.on(this.eventName, (e) => this.runState(e));
+
+    // run
+    let eventArg = {dataIn: initDataIn};
+    EventDispatcher.emit(this.eventName, eventArg);
+    console.log("set up finished");
   }
 
   setSize = function(width, height, rotation) {
@@ -69,12 +89,23 @@ class Car extends GameObject {
       this.turn(turnAngle, deltaTime);
       this.move(motionProperty.speed, deltaTime);
     }
-    //let realMotionProperty = this.move(motionProperty.speed, deltaTime);
+  }
 
-    // generation output data for the change
-    //let updateProperty = {motionProperty:realMotionProperty};
+  async runState(e) {
 
-    //return updateProperty;
+    let dataIn = e.dataIn;
+    let stateName = dataIn.nextState;
+
+    let StateNow = this.States[stateName];
+
+    StateNow.setInput(dataIn);
+
+    let dataOut = await StateNow.run();
+    console.log(StateNow.stateName + " Finished");
+
+    let eventArg = {dataIn: dataOut};
+    EventDispatcher.emit(this.eventName, eventArg); // trigger event
+
   }
 
   // v is a float, direction is a vector
@@ -114,20 +145,7 @@ class Car extends GameObject {
     Matter.Body.setAngle(this.body, this.body.angle + angularSpeed);
 
     this.headingDirection = createVector(Math.cos(this.body.angle), Math.sin(this.body.angle));
-
-
-    // let x = this.headingDirection.x;
-    // let y = this.headingDirection.y
-    // this.headingDirection.x = x*Math.cos(angularSpeed*deltaTime)-y*Math.sin(angularSpeed*deltaTime);
-    // this.headingDirection.y = x*Math.sin(angularSpeed*deltaTime)+y*Math.cos(angularSpeed*deltaTime);
-    //
-    // this.headingDirection.normalize();
-    //
-    // // set Rotation
-    // this.setRotation(Math.atan2(this.headingDirection.y, this.headingDirection.x));
-
   }
-
 }
 
 function randomNum(min, max) {
