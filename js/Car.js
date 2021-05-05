@@ -39,13 +39,13 @@ class Car extends GameObject {
     this.setRotation(rotation);
 
     // event set up
-    this.eventName = this.tage + this.ID;
+    this.eventName = this.tag + this.ID;
 
     let initDataIn = {
       previousState: null,
       nextState: "VisionState",
       vision: null,
-      deltaTime: 30/1000 // 30 frames per second
+      deltaTime: 60/1000 // 30 frames per second
     };
 
     EventDispatcher.on(this.eventName, (e) => this.runState(e));
