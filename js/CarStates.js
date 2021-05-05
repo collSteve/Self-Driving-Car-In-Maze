@@ -5,7 +5,11 @@ data =
   previousState:
   nextState:
   vision:
-
+  deltaTime:
+  brainDemands: {
+                  nextTargetPoint:
+                }
+  movementData:
 }
 */
 
@@ -172,7 +176,7 @@ class TranslationMotionState extends CarState {
     let pos =this.gameObject.body.position;
 
     // move
-    let speed = Math.sqrt(Math.pow(nextTargetPoint.x-pos.x,2) + Math.pow(nextTargetPoint.y-pos.y,2));
+    let speed = Math.sqrt(Math.pow(nextTargetPoint.x-pos.x,2) + Math.pow(nextTargetPoint.y-pos.y,2)); // need changing
     this.gameObject.move(speed, this.dataIn.deltaTime);
 
 
@@ -190,6 +194,7 @@ class TranslationMotionState extends CarState {
     else {
       dataOut.nextState = "TurningMotionState";
     }
+
     dataOut.previousState = this.stateName;
 
     await sleep(this.dataIn.deltaTime);

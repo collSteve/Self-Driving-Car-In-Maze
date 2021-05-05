@@ -39,7 +39,7 @@ class Car extends GameObject {
     this.setRotation(rotation);
 
     // event set up
-    this.eventName = this.tage + this.ID;
+    this.eventName = this.tag + this.ID;
 
     let initDataIn = {
       previousState: null,
@@ -68,35 +68,6 @@ class Car extends GameObject {
 
     // reshape body (matter.js)
   ///  Matter.Body.scale(this.body, widthRatio, heightRatio);
-  }
-
-  // public interface
-  update = function(deltaTime) {
-    // let motionProperty = {
-    //   speed:5,
-    //   //direction:createVector(randomNum(-1, 1),randomNum(-1, 1))
-    //   direction:createVector(0,-1)
-    // };
-    //
-    // motionProperty.direction = motionProperty.direction.normalize();
-    //
-    // let turnAngle = Math.atan2(motionProperty.direction.y,motionProperty.direction.x)
-    //         - Math.atan2(this.headingDirection.y,this.headingDirection.x);
-    //
-    //
-    // // either turn or move
-    // let error = 0.1;
-    //
-    // if (Math.abs(motionProperty.direction.y - this.headingDirection.y) > error ||
-    //     Math.abs(motionProperty.direction.x - this.headingDirection.x) > error) {
-    //       // turn
-    //   this.turn(turnAngle, deltaTime);
-    // }
-    // else {
-    //   // turn and move
-    //   this.turn(turnAngle, deltaTime);
-    //   this.move(motionProperty.speed, deltaTime);
-    // }
   }
 
   async runState(e) {
@@ -165,53 +136,4 @@ class Car extends GameObject {
 
 function randomNum(min, max) {
 	return Math.floor(Math.random() * (max - min)) + min; // You can remove the Math.floor if you don't want it to be an integer
-}
-
-// possible States:
-/*
-dataStructure:
-data =
-{
-  previousState:
-  nextState:
-  vision:
-
-}
-*/
-
-/*
-Event stateEndEvent;
-
-stateEndEvent.addlistener(Run, e);
-
-Run(e) {
-    nextSate = e.nextState;
-
-    dataOut = await nextSate(e.dataIn);
-
-    //construct new e
-    e.dataIn = dataOut;
-    e.nextSate = dataOut.nextSate;
-
-    trigger(stateEndEvent, e);
-  }
-
-const States = {
-  "State1": State1,
-  ....
-}
-
-*/
-
-async function sampleState(dataIn) { // input: {previous: State1, vision:{}, ...}
-  // input data process
-  let previousState = input.previousState;
-  // do sth
-
-  // output contruct
-  let dataOut = {};
-  let vision = {};
-  dataOut["nextState"] = State2;
-
-  return await State2(dataOut);
 }
