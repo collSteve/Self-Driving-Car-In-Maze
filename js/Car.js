@@ -1,3 +1,7 @@
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
 class Car extends GameObject {
   startPosition = createVector(0,0);
 
@@ -5,6 +9,15 @@ class Car extends GameObject {
   maxTurnSpeed = 0.1;
 
   headingDirection = createVector(0,-1);
+
+  States = {
+    "Abstract State" : new CarState(this),
+    "VisionState" : new VisionState(this),
+    "ThinkState" : new ThinkState(this),
+    "TurningMotionState" : new TurningMotionState(this),
+    "TranslationMotionState" : new TranslationMotionState(this)
+
+  }
 
   constructor(pos, width=0, height=0, rotation=0) {
     super();
@@ -24,6 +37,22 @@ class Car extends GameObject {
 
     this.body.frictionAir = 0.5; // large air friction
     this.setRotation(rotation);
+
+    // event set up
+    this.eventName = this.tage + this.ID;
+
+    let initDataIn = {
+      previousState: null,
+      nextState: "VisionState",
+      vision: null,
+      deltaTime: 30/1000 // 30 frames per second
+    };
+
+    EventDispatcher.on(this.eventName, (e) => this.runState(e));
+
+    // run
+    let eventArg = {dataIn: initDataIn};
+    EventDispatcher.emit(this.eventName, eventArg);
   }
 
   setSize = function(width, height, rotation) {
@@ -43,35 +72,49 @@ class Car extends GameObject {
 
   // public interface
   update = function(deltaTime) {
-    let motionProperty = {
-      speed:5,
-      //direction:createVector(randomNum(-1, 1),randomNum(-1, 1))
-      direction:createVector(2,-1)
-    };
+    // let motionProperty = {
+    //   speed:5,
+    //   //direction:createVector(randomNum(-1, 1),randomNum(-1, 1))
+    //   direction:createVector(0,-1)
+    // };
+    //
+    // motionProperty.direction = motionProperty.direction.normalize();
+    //
+    // let turnAngle = Math.atan2(motionProperty.direction.y,motionProperty.direction.x)
+    //         - Math.atan2(this.headingDirection.y,this.headingDirection.x);
+    //
+    //
+    // // either turn or move
+    // let error = 0.1;
+    //
+    // if (Math.abs(motionProperty.direction.y - this.headingDirection.y) > error ||
+    //     Math.abs(motionProperty.direction.x - this.headingDirection.x) > error) {
+    //       // turn
+    //   this.turn(turnAngle, deltaTime);
+    // }
+    // else {
+    //   // turn and move
+    //   this.turn(turnAngle, deltaTime);
+    //   this.move(motionProperty.speed, deltaTime);
+    // }
+  }
 
-    motionProperty.direction = motionProperty.direction.normalize();
+  async runState(e) {
 
-    // either turn or move
-    let error = 0.01;
+    let dataIn = e.dataIn;
+    let stateName = dataIn.nextState;
 
-    let turnAngle = Math.atan2(motionProperty.direction.y,motionProperty.direction.x)
-            - Math.atan2(this.headingDirection.y,this.headingDirection.x);
-    if (Math.abs(motionProperty.direction.y - this.headingDirection.y) > error ||
-        Math.abs(motionProperty.direction.x - this.headingDirection.x) > error) {
-          // turn
-      this.turn(turnAngle, deltaTime);
-    }
-    else {
-      // turn and move
-      this.turn(turnAngle, deltaTime);
-      this.move(motionProperty.speed, deltaTime);
-    }
-    //let realMotionProperty = this.move(motionProperty.speed, deltaTime);
+    let StateNow = this.States[stateName];
 
-    // generation output data for the change
-    //let updateProperty = {motionProperty:realMotionProperty};
+    StateNow.setInput(dataIn);
 
-    //return updateProperty;
+    let dataOut = await StateNow.run();
+
+    console.log(StateNow.stateName + " Finished");
+
+    let eventArg = {dataIn: dataOut};
+    EventDispatcher.emit(this.eventName, eventArg); // trigger event
+
   }
 
   // v is a float, direction is a vector
@@ -111,22 +154,64 @@ class Car extends GameObject {
     Matter.Body.setAngle(this.body, this.body.angle + angularSpeed);
 
     this.headingDirection = createVector(Math.cos(this.body.angle), Math.sin(this.body.angle));
-
-
-    // let x = this.headingDirection.x;
-    // let y = this.headingDirection.y
-    // this.headingDirection.x = x*Math.cos(angularSpeed*deltaTime)-y*Math.sin(angularSpeed*deltaTime);
-    // this.headingDirection.y = x*Math.sin(angularSpeed*deltaTime)+y*Math.cos(angularSpeed*deltaTime);
-    //
-    // this.headingDirection.normalize();
-    //
-    // // set Rotation
-    // this.setRotation(Math.atan2(this.headingDirection.y, this.headingDirection.x));
-
   }
 
+  stop = function() {
+    Matter.Body.setVelocity(this.body, {x:0,y:0});
+
+    this.headingDirection = createVector(Math.cos(this.body.angle), Math.sin(this.body.angle));
+  }
 }
 
 function randomNum(min, max) {
 	return Math.floor(Math.random() * (max - min)) + min; // You can remove the Math.floor if you don't want it to be an integer
+}
+
+// possible States:
+/*
+dataStructure:
+data =
+{
+  previousState:
+  nextState:
+  vision:
+
+}
+*/
+
+/*
+Event stateEndEvent;
+
+stateEndEvent.addlistener(Run, e);
+
+Run(e) {
+    nextSate = e.nextState;
+
+    dataOut = await nextSate(e.dataIn);
+
+    //construct new e
+    e.dataIn = dataOut;
+    e.nextSate = dataOut.nextSate;
+
+    trigger(stateEndEvent, e);
+  }
+
+const States = {
+  "State1": State1,
+  ....
+}
+
+*/
+
+async function sampleState(dataIn) { // input: {previous: State1, vision:{}, ...}
+  // input data process
+  let previousState = input.previousState;
+  // do sth
+
+  // output contruct
+  let dataOut = {};
+  let vision = {};
+  dataOut["nextState"] = State2;
+
+  return await State2(dataOut);
 }
