@@ -26,7 +26,7 @@ class CarState {
 
   async run() {
     // do sth
-    console.log("Running "+ this.stateName);
+    console.log("Running "+ this.stateName + this.gameObject.eventName);
 
     // output construct
     let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
@@ -56,7 +56,7 @@ class VisionState extends CarState {
 
   async run() {
     // To-Do: see
-    console.log("Running "+ this.stateName);
+    console.log("Running "+ this.stateName + this.gameObject.eventName);
 
     let vision = {};
 
@@ -84,14 +84,14 @@ class ThinkState extends CarState {
     let currentPos = this.gameObject.body.position;
 
     // To-Do: think
-    console.log("Running "+ this.stateName);
+    console.log("Running "+ this.stateName + this.gameObject.eventName);
 
     let demands = {};
 
     // sample data
     demands.motionDemands = {
-      nextTargetPoint: {x: currentPos.x + randomNum(-80,80),
-                        y:currentPos.y + randomNum(-80,80)}
+      nextTargetPoint: {x: currentPos.x + randomNum(-40,40),
+                        y:currentPos.y + randomNum(-40,40)}
     };
 
     // output construct
@@ -117,7 +117,7 @@ class TurningMotionState extends CarState {
 
   async run() {
     // To-Do: think
-    console.log("Running "+ this.stateName);
+    console.log("Running "+ this.stateName + this.gameObject.eventName);
 
     // data processing
     let demands = JSON.parse(JSON.stringify(this.dataIn.brainDemands));
@@ -167,7 +167,7 @@ class TranslationMotionState extends CarState {
 
   async run() {
     // To-Do: see
-    console.log("Running "+ this.stateName);
+    console.log("Running "+ this.stateName + this.gameObject.eventName);
 
     // data processing
     let demands = JSON.parse(JSON.stringify(this.dataIn.brainDemands));

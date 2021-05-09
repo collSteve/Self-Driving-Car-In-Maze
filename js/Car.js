@@ -81,7 +81,7 @@ class Car extends GameObject {
 
     let dataOut = await StateNow.run();
 
-    console.log(StateNow.stateName + " Finished");
+    console.log(StateNow.stateName + this.eventName + " Finished");
 
     let eventArg = {dataIn: dataOut};
     EventDispatcher.emit(this.eventName, eventArg); // trigger event
