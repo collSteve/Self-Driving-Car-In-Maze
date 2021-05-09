@@ -14,6 +14,7 @@ class Wall extends GameObject{
 
     // physics (matter.js)
     this.body = Matter.Bodies.rectangle(this.position.x,this.position.y, width, height, {isStatic:true});
+    this.body.label = "Wall";
     this.setRotation(rotation);
   }
 

@@ -58,7 +58,10 @@ class VisionState extends CarState {
     // To-Do: see
     console.log("Running "+ this.stateName);
 
-    let vision = {};
+    await sleep(1000);
+
+    let vision = this.gameObject.see();
+    console.log(vision); //TEMP
 
     // output construct
     let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
@@ -67,7 +70,6 @@ class VisionState extends CarState {
     dataOut.nextState = "ThinkState";
     dataOut.vision = vision;
 
-    await sleep(5000);
     return dataOut;
   }
 }
