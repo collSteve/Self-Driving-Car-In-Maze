@@ -5,8 +5,12 @@ const sleep = (milliseconds) => {
 class Car extends GameObject {
   startPosition = createVector(0,0);
 
+  // Car specs (Constants)
   maxSpeed = 5; // set up later
   maxTurnSpeed = 0.1;
+  VISION_RAYS = 5; //100; //No. of rays to cast when seeing
+  FIELD_OF_VISION = Math.PI // 3;
+  RENDER_DISTANCE = 500; //150; //in px
 
   headingDirection = createVector(0,-1);
 
@@ -35,6 +39,7 @@ class Car extends GameObject {
     // physics (matter.js)
     this.body = Matter.Bodies.rectangle(this.position.x,this.position.y, width, height);
 
+    this.body.label = "Car";
     this.body.frictionAir = 0.5; // large air friction
     this.setRotation(rotation);
 
@@ -68,6 +73,10 @@ class Car extends GameObject {
 
     // reshape body (matter.js)
   ///  Matter.Body.scale(this.body, widthRatio, heightRatio);
+  }
+
+  setLinkedEngine = function(engine) {
+      this.linkedEngine = engine;
   }
 
   async runState(e) {
@@ -131,6 +140,13 @@ class Car extends GameObject {
     Matter.Body.setVelocity(this.body, {x:0,y:0});
 
     this.headingDirection = createVector(Math.cos(this.body.angle), Math.sin(this.body.angle));
+  }
+
+  /*
+   * Requests vision from engine and returns array
+   */
+  see = function() {
+    return this.linkedEngine.getVision(this, this.VISION_RAYS, this.FIELD_OF_VISION, this.RENDER_DISTANCE);
   }
 }
 
