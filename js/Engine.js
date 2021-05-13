@@ -21,7 +21,7 @@ class Engine {
   }
 
   run = function(deltaTime) {
-
+    this.displayDebugObjects(debugObj);
     this.displayGameObjects(this.gameObjects);
 
   }
@@ -57,6 +57,18 @@ class Engine {
         drawArrow(pos,p5.Vector.mult(item.headingDirection,20),"red");
       }
     });
+
+    // debug
+
+  }
+
+  displayDebugObjects = function(objects) {
+    push();
+    objects.forEach((item, i) => {
+      strokeWeight(5);
+      point(item.pos.x,item.pos.y);
+    });
+    pop();
   }
 
   updateObjects = function(objects, deltaTime) {

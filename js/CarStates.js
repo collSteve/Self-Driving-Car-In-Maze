@@ -13,6 +13,8 @@ data =
 }
 */
 
+let debugObj = [];
+
 class CarState {
   stateName = "Abstract State";
   previousState = null;
@@ -92,11 +94,14 @@ class ThinkState extends CarState {
 
     // sample data
     demands.motionDemands = {
-      // nextTargetPoint: {x: currentPos.x + randomNum(-40,40),
-      //                   y:currentPos.y + randomNum(-40,40)}
-      nextTargetPoint: {x: currentPos.x ,
-                        y:currentPos.y - 50}
+      nextTargetPoint: {x: currentPos.x + randomNum(-50,50),
+                        y:currentPos.y + randomNum(-50,50)}
+      // nextTargetPoint: {x: currentPos.x ,
+      //                   y:currentPos.y - 50}
     };
+
+    debugObj.push({type:"point", pos:{x:demands.motionDemands.nextTargetPoint.x,
+                                      y:demands.motionDemands.nextTargetPoint.y}});
 
     // output construct
     let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
@@ -199,7 +204,7 @@ class TranslationMotionState extends CarState {
     let beforeMovePosition = {x:this.gameObject.body.position.x,y:this.gameObject.body.position.y};
     let beforeTime = Date.now();
 
-    let speed = Math.sqrt(Math.pow(nextTargetPoint.x-pos.x,2) + Math.pow(nextTargetPoint.y-pos.y,2)); // need changing
+    let speed = dist2D(nextTargetPoint, beforeMovePosition); // need changing
     this.gameObject.move(speed, this.dataIn.deltaTime);
 
     await sleep(this.dataIn.deltaTime); // move for this amount of time

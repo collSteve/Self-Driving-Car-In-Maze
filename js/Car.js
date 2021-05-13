@@ -157,7 +157,3 @@ class Car extends GameObject {
     return this.linkedEngine.getVision(this, this.VISION_RAYS, this.FIELD_OF_VISION, this.RENDER_DISTANCE);
   }
 }
-
-function randomNum(min, max) {
-	return Math.floor(Math.random() * (max - min)) + min; // You can remove the Math.floor if you don't want it to be an integer
-}
