@@ -56,7 +56,8 @@ class Car extends GameObject {
       previousState: null,
       nextState: "VisionState",
       vision: null,
-      deltaTime: 30/1000 // 30 frames per second
+      deltaTime: 1000/30, // 30 frames per second
+      engineTime: 1000/30
     };
 
     EventDispatcher.on(this.eventName, (e) => this.runState(e));
@@ -96,7 +97,7 @@ class Car extends GameObject {
 
     let dataOut = await StateNow.run();
 
-    console.log(StateNow.stateName + " Finished");
+    console.log(StateNow.stateName + this.eventName + " Finished");
 
     let eventArg = {dataIn: dataOut};
     EventDispatcher.emit(this.eventName, eventArg); // trigger event
@@ -153,6 +154,13 @@ class Car extends GameObject {
    */
   see = function() {
     return this.linkedEngine.getVision(this);
+  }
+
+  /*
+   * Requests vision from engine and returns array
+   */
+  see = function() {
+    return this.linkedEngine.getVision(this, this.VISION_RAYS, this.FIELD_OF_VISION, this.RENDER_DISTANCE);
   }
 }
 

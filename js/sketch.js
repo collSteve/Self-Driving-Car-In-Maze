@@ -15,9 +15,14 @@ function setup() {
   GameCar.sprite.colorProperty.fill = "blue";
   GameCar.sprite.colorProperty.stroke = "white";
 
+  // GameCar2 = new Car(createVector(200,150), 20, 20, Math.PI/2);
+  // GameCar2.sprite.colorProperty.fill = "blue";
+  // GameCar2.sprite.colorProperty.stroke = "white";
+
   GameEngine = new Engine(GameMaze);
 
   GameEngine.addGameObject(GameCar);
+  //GameEngine.addGameObject(GameCar2);
 }
 
 function draw() {
