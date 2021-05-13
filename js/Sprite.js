@@ -1,3 +1,9 @@
+/**
+ * @author: @collSteve , @SaahirM
+ * Desc: Sprite for Game Objects (controlling
+ *       their appearance on screen)
+ */
+
 const SpriteType = {
   Rect:"rect",
   Ellipse: "ellipse",

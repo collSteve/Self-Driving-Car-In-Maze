@@ -1,3 +1,12 @@
+/**
+ * @author: @collSteve , @SaahirM
+ * Desc: Physical object in game. Physical Game
+ * 		 Objects come with physical properties, 
+ * 		 a physics body, a sprite, a collider, an
+ * 		 ID, and functions to mutate its motion
+ * 		 attributes
+ */
+
 const MotionType = {
   Static:"static",
   Kinematic:"kinematic"

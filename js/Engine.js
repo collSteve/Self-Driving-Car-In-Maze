@@ -1,3 +1,11 @@
+/**
+ * @author: @collSteve , @SaahirM
+ * Desc: Back-end engine object which handles:
+ *       - Initializing physics engine (Matter.js)
+ *       - Storing all game objects
+ *       - Displaying all game objects
+ */
+
 class Engine {
   gameMaze;
   gameObjects = [];
@@ -91,15 +99,15 @@ class Engine {
    * https://github.com/Technostalgic/MatterJS_Raycast.git @ 09/May/2021 00:12 ADT
    *
    * @param obj object doing the "seeing" (preferably a car)
-   * @param n number of rays to cast infront of obj (int. must be > 1)
-   * @param fov Field of Vision infront of object
-   * @param distance How far the rays can go
-   * @return vision array of objects containing vectors representing rays and
-   *         possibly name of object ray collided with
+   * @return vision array of objects containing vectors (representing rays that
+   *         hit an object) and name of object ray collided with
    */
-  getVision = function(obj, n, fov, distance) {
-    //Note: pass obj and its properties? To be discussed
-    let raySource = Matter.Vector.create(obj.position.x, obj.position.y); //From center of obj (change to front of obj later?)
+  getVision = function(obj) {
+    let n = obj.VISION_RAYS;
+    let fov = obj.FIELD_OF_VISION;
+    let distance = obj.RENDER_DISTANCE;
+
+    let raySource = Matter.Vector.create(obj.position.x, obj.position.y); //From center of obj
     let leftmostRayAngle = Math.atan2(obj.headingDirection.x, -obj.headingDirection.y) - (fov / 2);
     let currRay = Matter.Vector.create(distance * Math.sin(leftmostRayAngle), -distance * Math.cos(leftmostRayAngle));
     let raySeparationAngle = fov / (n-1);
@@ -147,7 +155,7 @@ class Engine {
             }
 
             //Locate intersection
-            if ((Ray.slope != Line.slope) ||     // -> If both slopes not same
+            if ((Ray.slope != Line.slope) ||     // -> If both slopes not same/null
                 (Math.abs(Ray.slope - Line.slope) > ERROR))
             {
               let xCol, yCol;
@@ -185,9 +193,7 @@ class Engine {
         }
       });
       //Find closest intersection
-      if (lineCols.length == 0) {
-        vision.push(currRay);
-      } else {
+      if (lineCols.length > 0) {
         let closestCol = {
           pos: Matter.Vector.sub(lineCols[0], obj.position),
           obstacle: lineCols[0].obstacle
@@ -211,7 +217,7 @@ class Engine {
         });
       }
 
-      currRay = Matter.Vector.rotate(currRay, raySeparationAngle);
+      currRay = Matter.Vector.rotate(currRay, raySeparationAngle); //next ray
     }
     return vision;
   }

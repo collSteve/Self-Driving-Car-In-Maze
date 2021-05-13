@@ -1,3 +1,9 @@
+/**
+ * @author: @collSteve , @SaahirM
+ * Desc: Car object with objective to traverse maze. Has the ability to
+ * 		 see, move and be in a state.
+ */
+
 const sleep = (milliseconds) => {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
@@ -8,9 +14,9 @@ class Car extends GameObject {
   // Car specs (Constants)
   maxSpeed = 5; // set up later
   maxTurnSpeed = 0.1;
-  VISION_RAYS = 5; //100; //No. of rays to cast when seeing
-  FIELD_OF_VISION = Math.PI // 3;
-  RENDER_DISTANCE = 500; //150; //in px
+  VISION_RAYS = 100; //No. of rays to cast when seeing
+  FIELD_OF_VISION = Math.PI / 3; //in radians
+  RENDER_DISTANCE = 150; //in px
 
   headingDirection = createVector(0,-1);
 
@@ -146,7 +152,7 @@ class Car extends GameObject {
    * Requests vision from engine and returns array
    */
   see = function() {
-    return this.linkedEngine.getVision(this, this.VISION_RAYS, this.FIELD_OF_VISION, this.RENDER_DISTANCE);
+    return this.linkedEngine.getVision(this);
   }
 }
 
