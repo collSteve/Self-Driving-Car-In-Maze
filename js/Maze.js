@@ -1,3 +1,9 @@
+/**
+ * @author: @collSteve , @SaahirM
+ * Desc: Maze object containing Walls. To be run
+ * 		 by an Engine, and traversed by Cars.
+ */
+
 class Maze {
   maze = [];
 

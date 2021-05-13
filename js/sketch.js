@@ -1,3 +1,10 @@
+/**
+ * @author: @collSteve , @SaahirM
+ * Desc: Main script. Creates and initializes game
+ *       before letting Engine take over and display
+ *       everything
+ */
+
 let GameEngine, GameMaze, GameCar;
 
 function setup() {

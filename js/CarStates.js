@@ -1,4 +1,12 @@
+/**
+ * @author: @collSteve , @SaahirM
+ * Desc: Class with details about what states the Car can
+ * 		 be in, and how they work.
+ */
+
 /*
+- State template -
+
 dataStructure:
 data =
 {
@@ -61,7 +69,6 @@ class VisionState extends CarState {
     await sleep(1000);
 
     let vision = this.gameObject.see();
-    console.log(vision); //TEMP
 
     // output construct
     let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy

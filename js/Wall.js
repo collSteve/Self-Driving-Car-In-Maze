@@ -1,3 +1,8 @@
+/**
+ * @author: @collSteve , @SaahirM
+ * Desc: Wall object in Maze (Static object)
+ */
+
 class Wall extends GameObject{
   constructor(pos, width=0, height=0, rotation=0) {
     super();
