@@ -26,7 +26,7 @@ class CarState {
 
   async run() {
     // do sth
-    console.log("Running "+ this.stateName);
+    console.log("Running "+ this.stateName + this.gameObject.eventName);
 
     // output construct
     let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
@@ -56,7 +56,7 @@ class VisionState extends CarState {
 
   async run() {
     // To-Do: see
-    console.log("Running "+ this.stateName);
+    console.log("Running "+ this.stateName + this.gameObject.eventName);
 
     await sleep(1000);
 
@@ -86,14 +86,16 @@ class ThinkState extends CarState {
     let currentPos = this.gameObject.body.position;
 
     // To-Do: think
-    console.log("Running "+ this.stateName);
+    console.log("Running "+ this.stateName + this.gameObject.eventName);
 
     let demands = {};
 
     // sample data
     demands.motionDemands = {
-      nextTargetPoint: {x: currentPos.x + randomNum(-80,80),
-                        y:currentPos.y + randomNum(-80,80)}
+      // nextTargetPoint: {x: currentPos.x + randomNum(-40,40),
+      //                   y:currentPos.y + randomNum(-40,40)}
+      nextTargetPoint: {x: currentPos.x ,
+                        y:currentPos.y - 50}
     };
 
     // output construct
@@ -119,7 +121,7 @@ class TurningMotionState extends CarState {
 
   async run() {
     // To-Do: think
-    console.log("Running "+ this.stateName);
+    console.log("Running "+ this.stateName + this.gameObject.eventName);
 
     // data processing
     let demands = JSON.parse(JSON.stringify(this.dataIn.brainDemands));
@@ -165,41 +167,74 @@ class TranslationMotionState extends CarState {
     super(gameObject);
     this.stateName = "TranslationMotionState";
     this.distanceError = 5;
+    this.stuckTimeRange = 10/1000;
   }
 
   async run() {
     // To-Do: see
-    console.log("Running "+ this.stateName);
+    console.log("Running "+ this.stateName + this.gameObject.eventName);
 
     // data processing
+    let previousPosition, previousSpeed;
+    if (!this.dataIn.previousPosition){
+      previousPosition = {x:this.gameObject.startPosition.x,y:this.gameObject.startPosition.y};
+    }
+    else {
+      previousPosition = JSON.parse(JSON.stringify(this.dataIn.previousPosition));
+    }
+
+    if (!this.dataIn.previousSpeed){
+      previousSpeed = 0;
+    }
+    else {
+      previousSpeed = JSON.parse(JSON.stringify(this.dataIn.previousSpeed));
+    }
+
     let demands = JSON.parse(JSON.stringify(this.dataIn.brainDemands));
     let motionDemands = demands.motionDemands;
     let nextTargetPoint = motionDemands.nextTargetPoint;
     let pos =this.gameObject.body.position;
 
     // move
+    let beforeMovePosition = {x:this.gameObject.body.position.x,y:this.gameObject.body.position.y};
+    let beforeTime = Date.now();
+
     let speed = Math.sqrt(Math.pow(nextTargetPoint.x-pos.x,2) + Math.pow(nextTargetPoint.y-pos.y,2)); // need changing
     this.gameObject.move(speed, this.dataIn.deltaTime);
 
+    await sleep(this.dataIn.deltaTime); // move for this amount of time
 
     let currentPos = this.gameObject.body.position;
-    let distanceDiff = Math.sqrt((currentPos.x - nextTargetPoint.x)*(currentPos.x - nextTargetPoint.x) +
-                                 (currentPos.y - nextTargetPoint.y)*(currentPos.y - nextTargetPoint.y));
+    let targetDistanceDiff = dist2D(currentPos, nextTargetPoint);
+
+    let movedDistance = dist2D(currentPos, beforeMovePosition);
 
     // output construct
     let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
 
-    if (distanceDiff < this.distanceError) {
+    let currTime = Date.now();
+    let realSpeed = speed/(this.dataIn.engineTime);
+
+    if (movedDistance < realSpeed * (currTime - beforeTime)/1000) {
       this.gameObject.stop();
       dataOut.nextState = "VisionState";
+
+      console.log("Stucked", currTime - beforeTime);
+      console.log(movedDistance, "<", realSpeed * (currTime - beforeTime));
+
+      speed = 0;
+    }
+
+    else if (targetDistanceDiff < this.distanceError) {
+      this.gameObject.stop();
+      dataOut.nextState = "VisionState";
+      speed = 0;
     }
     else {
       dataOut.nextState = "TurningMotionState";
     }
 
     dataOut.previousState = this.stateName;
-
-    await sleep(this.dataIn.deltaTime);
 
     return dataOut;
   }
