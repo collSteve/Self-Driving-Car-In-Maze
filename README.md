@@ -4,7 +4,7 @@ By: @collSteve and @SaahirM
 
 ## Description
 
-A simulation of one or more "Cars" finding their way through a maze to try and reach a goal. The cars control themself, and decide their next moves algorithmically. Currently a Work-In-Progress project
+A simulation of one or more "Cars" finding their way through a maze to try and reach a goal. The cars control themselves, and decide their next moves algorithmically. Currently a Work-In-Progress project
 
 ## Instructions
 
