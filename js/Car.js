@@ -49,6 +49,9 @@ class Car extends GameObject {
     this.body.frictionAir = 0.5; // large air friction
     this.setRotation(rotation);
 
+    // memory set up
+    this.initializeMemory();
+
     // event set up
     this.eventName = this.tag + this.ID;
 
@@ -56,8 +59,8 @@ class Car extends GameObject {
       previousState: null,
       nextState: "VisionState",
       vision: null,
-      deltaTime: 1000/30, // 30 frames per second
-      engineTime: 1000/30
+      deltaTime: 1000/60, // 30 frames per second
+      engineTime: 1000/60
     };
 
     EventDispatcher.on(this.eventName, (e) => this.runState(e));
@@ -80,6 +83,15 @@ class Car extends GameObject {
 
     // reshape body (matter.js)
   ///  Matter.Body.scale(this.body, widthRatio, heightRatio);
+
+  }
+
+  initializeMemory = function() {
+    this.memory = new Memory();
+    this.memory.previousPosition = null;
+    this.memory.obstacleHitPoints = [];
+    this.memory.previousPositions = [];
+    this.memory.idealPath = [];
   }
 
   setLinkedEngine = function(engine) {
@@ -106,7 +118,7 @@ class Car extends GameObject {
 
   // v is a float, direction is a vector
   move = function(v, deltaTime) {
-    let direction = this.headingDirection;
+    let direction= this.headingDirection.normalize();
 
     // make sure speed does not exceed maximum speed
     if (v > this.maxSpeed) {
@@ -123,6 +135,8 @@ class Car extends GameObject {
     //this.moveBy(moveVector);
     // matter.js move
     Matter.Body.setVelocity(this.body, speedVector);
+
+    console.log("move:",speedVector);
 
     this.headingDirection = createVector(Math.cos(this.body.angle), Math.sin(this.body.angle));
 
@@ -162,8 +176,4 @@ class Car extends GameObject {
   see = function() {
     return this.linkedEngine.getVision(this, this.VISION_RAYS, this.FIELD_OF_VISION, this.RENDER_DISTANCE);
   }
-}
-
-function randomNum(min, max) {
-	return Math.floor(Math.random() * (max - min)) + min; // You can remove the Math.floor if you don't want it to be an integer
 }

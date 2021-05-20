@@ -21,6 +21,8 @@ data =
 }
 */
 
+let debugObj = [];
+
 class CarState {
   stateName = "Abstract State";
   previousState = null;
@@ -70,6 +72,13 @@ class VisionState extends CarState {
 
     let vision = this.gameObject.see();
 
+    // store vision
+    vision.forEach((item, i) => {
+      if (item.obstacle == "Wall") {
+        this.gameObject.memory.obstacleHitPoints.push(deepCopy(item));
+      }
+    });
+
     // output construct
     let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
 
@@ -99,11 +108,14 @@ class ThinkState extends CarState {
 
     // sample data
     demands.motionDemands = {
-      // nextTargetPoint: {x: currentPos.x + randomNum(-40,40),
-      //                   y:currentPos.y + randomNum(-40,40)}
-      nextTargetPoint: {x: currentPos.x ,
-                        y:currentPos.y - 50}
+      nextTargetPoint: {x: currentPos.x + randomNum(-50,50),
+                        y:currentPos.y + randomNum(-50,50)}
+      // nextTargetPoint: {x: currentPos.x ,
+      //                   y:currentPos.y - 50}
     };
+
+    debugObj.push({type:"point", pos:{x:demands.motionDemands.nextTargetPoint.x,
+                                      y:demands.motionDemands.nextTargetPoint.y}});
 
     // output construct
     let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
@@ -175,6 +187,7 @@ class TranslationMotionState extends CarState {
     this.stateName = "TranslationMotionState";
     this.distanceError = 5;
     this.stuckTimeRange = 10/1000;
+    this.stuckSpeedRange = 0.1;
   }
 
   async run() {
@@ -206,8 +219,8 @@ class TranslationMotionState extends CarState {
     let beforeMovePosition = {x:this.gameObject.body.position.x,y:this.gameObject.body.position.y};
     let beforeTime = Date.now();
 
-    let speed = Math.sqrt(Math.pow(nextTargetPoint.x-pos.x,2) + Math.pow(nextTargetPoint.y-pos.y,2)); // need changing
-    this.gameObject.move(speed, this.dataIn.deltaTime);
+    let speed = dist2D(nextTargetPoint, beforeMovePosition); // need changing
+    let realSpeed = this.gameObject.move(speed, this.dataIn.deltaTime).speed;
 
     await sleep(this.dataIn.deltaTime); // move for this amount of time
 
@@ -220,18 +233,29 @@ class TranslationMotionState extends CarState {
     let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
 
     let currTime = Date.now();
-    let realSpeed = speed/(this.dataIn.engineTime);
+    //let realSpeed = speed/(this.dataIn.engineTime);
 
-    if (movedDistance < realSpeed * (currTime - beforeTime)/1000) {
-      this.gameObject.stop();
+    // if (movedDistance < speed * (currTime - beforeTime)/1000) {
+    //   this.gameObject.stop();
+    //   dataOut.nextState = "VisionState";
+    //
+    //   console.log("Stucked", currTime - beforeTime);
+    //   console.log(movedDistance, "<", speed * (currTime - beforeTime)/1000);
+    //
+    //   speed = 0;
+    // }
+
+
+    if (this.gameObject.body.speed / this.gameObject.body.frictionAir < realSpeed - this.stuckSpeedRange) {
+
       dataOut.nextState = "VisionState";
 
       console.log("Stucked", currTime - beforeTime);
-      console.log(movedDistance, "<", realSpeed * (currTime - beforeTime));
+      console.log(this.gameObject.body.speed/this.gameObject.body.frictionAir, "<", realSpeed - this.stuckSpeedRange);
 
+      this.gameObject.stop();
       speed = 0;
     }
-
     else if (targetDistanceDiff < this.distanceError) {
       this.gameObject.stop();
       dataOut.nextState = "VisionState";
@@ -239,7 +263,14 @@ class TranslationMotionState extends CarState {
     }
     else {
       dataOut.nextState = "TurningMotionState";
+
+      console.log(this.gameObject.body.speed/this.gameObject.body.frictionAir, "vs", realSpeed - this.stuckSpeedRange);
+      console.log(currentPos, beforeMovePosition);
     }
+
+    // store Memory
+    this.gameObject.memory.previousPosition = deepCopy(currentPos);
+    this.gameObject.memory.previousPositions.push(deepCopy(currentPos));
 
     dataOut.previousState = this.stateName;
 
