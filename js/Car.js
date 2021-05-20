@@ -43,6 +43,9 @@ class Car extends GameObject {
     this.body.frictionAir = 0.5; // large air friction
     this.setRotation(rotation);
 
+    // memory set up
+    this.initializeMemory();
+
     // event set up
     this.eventName = this.tag + this.ID;
 
@@ -74,6 +77,15 @@ class Car extends GameObject {
 
     // reshape body (matter.js)
   ///  Matter.Body.scale(this.body, widthRatio, heightRatio);
+
+  }
+
+  initializeMemory = function() {
+    this.memory = new Memory();
+    this.memory.previousPosition = null;
+    this.memory.obstacleHitPoints = [];
+    this.memory.previousPositions = [];
+    this.memory.idealPath = [];
   }
 
   setLinkedEngine = function(engine) {

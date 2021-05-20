@@ -65,6 +65,13 @@ class VisionState extends CarState {
     let vision = this.gameObject.see();
     console.log(vision); //TEMP
 
+    // store vision
+    vision.forEach((item, i) => {
+      if (item.obstacle == "Wall") {
+        this.gameObject.memory.obstacleHitPoints.push(deepCopy(item));
+      }
+    });
+
     // output construct
     let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
 
@@ -253,6 +260,10 @@ class TranslationMotionState extends CarState {
       console.log(this.gameObject.body.speed/this.gameObject.body.frictionAir, "vs", realSpeed - this.stuckSpeedRange);
       console.log(currentPos, beforeMovePosition);
     }
+
+    // store Memory
+    this.gameObject.memory.previousPosition = deepCopy(currentPos);
+    this.gameObject.memory.previousPositions.push(deepCopy(currentPos));
 
     dataOut.previousState = this.stateName;
 
