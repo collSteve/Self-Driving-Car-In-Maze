@@ -29,18 +29,23 @@ class CarState {
     this.nextState = nextState;
   }
 
+  generateDataOut = function() {
+    // output construct
+    let dataOut = deepCopy(this.dataIn); // deep copy
+
+    dataOut.previousState = this.stateName;
+    dataOut.nextState = this.nextState; // loop back: change later
+    return dataOut;
+  }
+
   async run() {
     // do sth
     console.log("Running "+ this.stateName + this.gameObject.eventName);
 
-    // output construct
-    let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
 
-    dataOut["previousState"] = this.stateName;
-    dataOut["nextSate"] = this.nextState; // loop back: change later
     //return dataOut;
 
-    return dataOut;
+    return this.generateDataOut();
   }
 
   setInput = function(dataIn) {
