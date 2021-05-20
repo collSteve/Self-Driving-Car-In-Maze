@@ -18,6 +18,14 @@ class Engine {
      gameMaze.maze.forEach((wall, i) => {
        this.addGameObject(wall);
      });
+
+
+     Events.on(engine, "collisionActive", function (event) {
+       let pairs = event.pairs;
+       pairs.forEach((item, i) => {
+          item.onCollision();
+       });
+     });
   }
 
   run = function(deltaTime) {

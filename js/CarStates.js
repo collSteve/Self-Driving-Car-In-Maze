@@ -12,7 +12,7 @@ data =
   movementData:
 }
 */
-
+// TO-DO: update state's constructors
 let debugObj = [];
 
 class CarState {
@@ -22,8 +22,11 @@ class CarState {
 
   gameObject = null;
 
-  constructor(gameObject) {
+  nextState = null;
+
+  constructor(gameObject, nextState) {
     this.gameObject = gameObject;
+    this.nextState = nextState;
   }
 
   async run() {
@@ -34,14 +37,10 @@ class CarState {
     let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
 
     dataOut["previousState"] = this.stateName;
-    dataOut["nextSate"] = "Abstract State"; // loop back: change later
+    dataOut["nextSate"] = this.nextState; // loop back: change later
     //return dataOut;
 
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(dataOut);
-      }, 5000); // take 5s to return
-    });
+    return dataOut;
   }
 
   setInput = function(dataIn) {
@@ -51,8 +50,8 @@ class CarState {
 }
 
 class VisionState extends CarState {
-  constructor(gameObject) {
-    super(gameObject);
+  constructor(gameObject, nextState) {
+    super(gameObject, nextState);
     this.stateName = "VisionState";
   }
 
@@ -76,7 +75,7 @@ class VisionState extends CarState {
     let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
 
     dataOut.previousState = this.stateName;
-    dataOut.nextState = "ThinkState";
+    dataOut.nextState = this.nextState;
     dataOut.vision = vision;
 
     return dataOut;
