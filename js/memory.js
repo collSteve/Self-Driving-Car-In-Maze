@@ -5,4 +5,5 @@ class Memory {
 
   idealPath = [];
 
+  goalObjects = []; 
 }

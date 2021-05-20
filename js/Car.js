@@ -8,6 +8,7 @@ const sleep = (milliseconds) => {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
+// TO-DO: update Car's runState method for creating states
 class Car extends GameObject {
   startPosition = createVector(0,0);
 
@@ -20,14 +21,14 @@ class Car extends GameObject {
 
   headingDirection = createVector(0,-1);
 
+  // To-Do: update input
   States = {
     "Abstract State" : new CarState(this),
     "VisionState" : new VisionState(this),
     "ThinkState" : new ThinkState(this),
     "TurningMotionState" : new TurningMotionState(this),
     "TranslationMotionState" : new TranslationMotionState(this)
-
-  }
+  };
 
   constructor(pos, width=0, height=0, rotation=0) {
     super();
@@ -175,5 +176,15 @@ class Car extends GameObject {
    */
   see = function() {
     return this.linkedEngine.getVision(this, this.VISION_RAYS, this.FIELD_OF_VISION, this.RENDER_DISTANCE);
+  }
+
+  onCollision = function() {
+    let collidings = *collidingItems*; // all gameobjects that are colliding with the car
+    if (goal is in colliding) {
+      this.memory.reachedGoal = true;
+    }
+    else {
+      this.memory.collided = true;
+    }
   }
 }
