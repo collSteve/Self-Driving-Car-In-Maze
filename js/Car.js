@@ -173,7 +173,7 @@ class Car extends GameObject {
   }
 
   onCollision = function() {
-    let collidings = this.collidingItems;
+    let collidings = *collidingItems*; // all gameobjects that are colliding with the car
     if (goal is in colliding) {
       this.memory.reachedGoal = true;
     }

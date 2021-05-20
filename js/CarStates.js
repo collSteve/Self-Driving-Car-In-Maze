@@ -77,7 +77,7 @@ class VisionState extends CarState {
     });
 
     // output construct
-    let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
+    let dataOut = deepCopy(this.dataIn); // deep copy
 
     dataOut.previousState = this.stateName;
     dataOut.nextState = this.nextState;
