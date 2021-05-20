@@ -173,6 +173,7 @@ class TranslationMotionState extends CarState {
     this.stateName = "TranslationMotionState";
     this.distanceError = 5;
     this.stuckTimeRange = 10/1000;
+    this.stuckSpeedRange = 0.1;
   }
 
   async run() {
@@ -205,7 +206,7 @@ class TranslationMotionState extends CarState {
     let beforeTime = Date.now();
 
     let speed = dist2D(nextTargetPoint, beforeMovePosition); // need changing
-    this.gameObject.move(speed, this.dataIn.deltaTime);
+    let realSpeed = this.gameObject.move(speed, this.dataIn.deltaTime).speed;
 
     await sleep(this.dataIn.deltaTime); // move for this amount of time
 
@@ -218,18 +219,29 @@ class TranslationMotionState extends CarState {
     let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
 
     let currTime = Date.now();
-    let realSpeed = speed/(this.dataIn.engineTime);
+    //let realSpeed = speed/(this.dataIn.engineTime);
 
-    if (movedDistance < realSpeed * (currTime - beforeTime)/1000) {
-      this.gameObject.stop();
+    // if (movedDistance < speed * (currTime - beforeTime)/1000) {
+    //   this.gameObject.stop();
+    //   dataOut.nextState = "VisionState";
+    //
+    //   console.log("Stucked", currTime - beforeTime);
+    //   console.log(movedDistance, "<", speed * (currTime - beforeTime)/1000);
+    //
+    //   speed = 0;
+    // }
+
+
+    if (this.gameObject.body.speed / this.gameObject.body.frictionAir < realSpeed - this.stuckSpeedRange) {
+
       dataOut.nextState = "VisionState";
 
       console.log("Stucked", currTime - beforeTime);
-      console.log(movedDistance, "<", realSpeed * (currTime - beforeTime));
+      console.log(this.gameObject.body.speed/this.gameObject.body.frictionAir, "<", realSpeed - this.stuckSpeedRange);
 
+      this.gameObject.stop();
       speed = 0;
     }
-
     else if (targetDistanceDiff < this.distanceError) {
       this.gameObject.stop();
       dataOut.nextState = "VisionState";
@@ -237,6 +249,9 @@ class TranslationMotionState extends CarState {
     }
     else {
       dataOut.nextState = "TurningMotionState";
+
+      console.log(this.gameObject.body.speed/this.gameObject.body.frictionAir, "vs", realSpeed - this.stuckSpeedRange);
+      console.log(currentPos, beforeMovePosition);
     }
 
     dataOut.previousState = this.stateName;

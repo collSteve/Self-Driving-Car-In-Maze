@@ -50,8 +50,8 @@ class Car extends GameObject {
       previousState: null,
       nextState: "VisionState",
       vision: null,
-      deltaTime: 1000/30, // 30 frames per second
-      engineTime: 1000/30
+      deltaTime: 1000/60, // 30 frames per second
+      engineTime: 1000/60
     };
 
     EventDispatcher.on(this.eventName, (e) => this.runState(e));
@@ -100,7 +100,7 @@ class Car extends GameObject {
 
   // v is a float, direction is a vector
   move = function(v, deltaTime) {
-    let direction = this.headingDirection;
+    let direction= this.headingDirection.normalize();
 
     // make sure speed does not exceed maximum speed
     if (v > this.maxSpeed) {
@@ -117,6 +117,8 @@ class Car extends GameObject {
     //this.moveBy(moveVector);
     // matter.js move
     Matter.Body.setVelocity(this.body, speedVector);
+
+    console.log("move:",speedVector);
 
     this.headingDirection = createVector(Math.cos(this.body.angle), Math.sin(this.body.angle));
 
