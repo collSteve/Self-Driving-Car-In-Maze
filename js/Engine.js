@@ -27,11 +27,17 @@ class Engine {
        this.addGameObject(wall);
      });
 
-
-     Events.on(engine, "collisionActive", function (event) {
+     // set up collision event for gameobjects
+     Matter.Events.on(this.physicsEngine, "collisionActive", function (event) {
        let pairs = event.pairs;
+       let collidedBodyIDs = new Set();
        pairs.forEach((item, i) => {
-          item.onCollision();
+          let bodyA = item.bodyA;
+          let bodyB = item.bodyB;
+
+          bodyA.gameObject.onCollision({hitObject:bodyB});
+          bodyB.gameObject.onCollision({hitObject:bodyA});
+
        });
      });
   }
@@ -104,7 +110,26 @@ class Engine {
     if (obj.tag == "Car") {
       obj.setLinkedEngine(this);
     }
+  }
 
+  runAllCars = function() {
+    this.gameObjects.forEach((item, i) => {
+      if (item.tag == "Car") {
+        item.running = true;
+        // fire runState Event using stateInfo in its memory
+        let eventArg = {dataIn:deepCopy(item.memory.stateInfo.stateDataOut)};
+        EventDispatcher.emit(item.eventName, eventArg);
+      }
+    });
+  }
+
+  stopAllCars = function() {
+    this.gameObjects.forEach((item, i) => {
+      if (item.tag == "Car") {
+        item.stop();
+        item.running = false;
+      }
+    });
   }
 
   /*

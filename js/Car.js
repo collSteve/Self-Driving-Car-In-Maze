@@ -21,6 +21,8 @@ class Car extends GameObject {
 
   headingDirection = createVector(0,-1);
 
+  running = false;
+
   // To-Do: update input
   States = {
     "Abstract State" : new CarState(this),
@@ -29,6 +31,19 @@ class Car extends GameObject {
     "TurningMotionState" : new TurningMotionState(this),
     "TranslationMotionState" : new TranslationMotionState(this)
   };
+
+  setCarStateNextState = function(stateName, targetType, targetStateName) {
+    let initialState = this.States.stateName.stateOut.targetType;
+    if (typeof initialState === 'undefined') {
+      console.log("[Connect State Failed] State " + stateName + " does not have connector to "+targetType);
+    }
+    else if (typeof this.States.targetStateName === 'undefined') {
+      console.log("[Connect State Failed] " + this.tage + " does not support " + targetStateName);
+    }
+    else {
+      this.States.stateName.stateOut.targetType = targetStateName;
+    }
+  }
 
   constructor(pos, width=0, height=0, rotation=0) {
     super();
@@ -50,26 +65,30 @@ class Car extends GameObject {
     this.body.frictionAir = 0.5; // large air friction
     this.setRotation(rotation);
 
+    this.bodyBinding(); //  bind matter js body with this object instance
+
     // memory set up
     this.initializeMemory();
 
     // event set up
     this.eventName = this.tag + this.ID;
 
-    let initDataIn = {
-      previousState: null,
-      nextState: "VisionState",
-      vision: null,
-      deltaTime: 1000/60, // 30 frames per second
-      engineTime: 1000/60
-    };
+    // let initDataIn = {
+    //   previousState: null,
+    //   nextState: "VisionState",
+    //   vision: null,
+    //   deltaTime: 1000/60, // 30 frames per second
+    //   engineTime: 1000/60
+    // };
 
     EventDispatcher.on(this.eventName, (e) => this.runState(e));
 
-    // run
-    let eventArg = {dataIn: initDataIn};
-    EventDispatcher.emit(this.eventName, eventArg);
+    // // run
+    // let eventArg = {dataIn: initDataIn};
+    // EventDispatcher.emit(this.eventName, eventArg);
   }
+
+
 
   setSize = function(width, height, rotation) {
     let widthRatio = width / this.collider.size.width;
@@ -110,11 +129,14 @@ class Car extends GameObject {
 
     let dataOut = await StateNow.run();
 
+    this.memory.stateInfo.stateDataOut = deepCopy(dataOut); // store in memory
+
     console.log(StateNow.stateName + this.eventName + " Finished");
 
-    let eventArg = {dataIn: dataOut};
-    EventDispatcher.emit(this.eventName, eventArg); // trigger event
-
+    if (this.running) {
+      let eventArg = {dataIn: dataOut};
+      EventDispatcher.emit(this.eventName, eventArg); // trigger event
+    }
   }
 
   // v is a float, direction is a vector
@@ -171,20 +193,25 @@ class Car extends GameObject {
     return this.linkedEngine.getVision(this);
   }
 
-  /*
-   * Requests vision from engine and returns array
-   */
-  see = function() {
-    return this.linkedEngine.getVision(this, this.VISION_RAYS, this.FIELD_OF_VISION, this.RENDER_DISTANCE);
-  }
+  onCollision = function(e) {
+    console.log(this.eventName + " Collided with " + e.hitObject.label);
 
-  onCollision = function() {
-    let collidings = *collidingItems*; // all gameobjects that are colliding with the car
-    if (goal is in colliding) {
+    if (e.hitObject.label == "Goal") {
       this.memory.reachedGoal = true;
     }
     else {
       this.memory.collided = true;
+      this.memory.addCollidedObject(e.hitObject);
+      this.memory.isStuck = true;
     }
   }
+  // onCollision = function() {
+  //   let collidings = *collidingItems*; // all gameobjects that are colliding with the car
+  //   if (goal is in colliding) {
+  //     this.memory.reachedGoal = true;
+  //   }
+  //   else {
+  //     this.memory.collided = true;
+  //   }
+  // }
 }
