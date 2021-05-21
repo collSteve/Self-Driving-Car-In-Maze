@@ -20,7 +20,7 @@ class Engine {
      });
 
 
-     Events.on(engine, "collisionActive", function (event) {
+     Matter.Events.on(this.physicsEngine, "collisionActive", function (event) {
        let pairs = event.pairs;
        pairs.forEach((item, i) => {
           item.onCollision();

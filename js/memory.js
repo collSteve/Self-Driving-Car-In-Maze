@@ -5,5 +5,9 @@ class Memory {
 
   idealPath = [];
 
-  goalObjects = []; 
+  goalObjects = [];
+
+  vision = null;
+
+  brainDemand = null;
 }

@@ -172,13 +172,13 @@ class Car extends GameObject {
     return this.linkedEngine.getVision(this, this.VISION_RAYS, this.FIELD_OF_VISION, this.RENDER_DISTANCE);
   }
 
-  onCollision = function() {
-    let collidings = *collidingItems*; // all gameobjects that are colliding with the car
-    if (goal is in colliding) {
-      this.memory.reachedGoal = true;
-    }
-    else {
-      this.memory.collided = true;
-    }
-  }
+  // onCollision = function() {
+  //   let collidings = *collidingItems*; // all gameobjects that are colliding with the car
+  //   if (goal is in colliding) {
+  //     this.memory.reachedGoal = true;
+  //   }
+  //   else {
+  //     this.memory.collided = true;
+  //   }
+  // }
 }
