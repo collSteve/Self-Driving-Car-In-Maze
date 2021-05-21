@@ -15,6 +15,8 @@ class Car extends GameObject {
 
   headingDirection = createVector(0,-1);
 
+  running = false;
+
   // To-Do: update input
   States = {
     "Abstract State" : new CarState(this),
@@ -57,26 +59,30 @@ class Car extends GameObject {
     this.body.frictionAir = 0.5; // large air friction
     this.setRotation(rotation);
 
+    this.bodyBinding(); //  bind matter js body with this object instance
+
     // memory set up
     this.initializeMemory();
 
     // event set up
     this.eventName = this.tag + this.ID;
 
-    let initDataIn = {
-      previousState: null,
-      nextState: "VisionState",
-      vision: null,
-      deltaTime: 1000/60, // 30 frames per second
-      engineTime: 1000/60
-    };
+    // let initDataIn = {
+    //   previousState: null,
+    //   nextState: "VisionState",
+    //   vision: null,
+    //   deltaTime: 1000/60, // 30 frames per second
+    //   engineTime: 1000/60
+    // };
 
     EventDispatcher.on(this.eventName, (e) => this.runState(e));
 
-    // run
-    let eventArg = {dataIn: initDataIn};
-    EventDispatcher.emit(this.eventName, eventArg);
+    // // run
+    // let eventArg = {dataIn: initDataIn};
+    // EventDispatcher.emit(this.eventName, eventArg);
   }
+
+
 
   setSize = function(width, height, rotation) {
     let widthRatio = width / this.collider.size.width;
@@ -117,11 +123,14 @@ class Car extends GameObject {
 
     let dataOut = await StateNow.run();
 
+    this.memory.stateInfo.stateDataOut = deepCopy(dataOut); // store in memory
+
     console.log(StateNow.stateName + this.eventName + " Finished");
 
-    let eventArg = {dataIn: dataOut};
-    EventDispatcher.emit(this.eventName, eventArg); // trigger event
-
+    if (this.running) {
+      let eventArg = {dataIn: dataOut};
+      EventDispatcher.emit(this.eventName, eventArg); // trigger event
+    }
   }
 
   // v is a float, direction is a vector
@@ -178,13 +187,18 @@ class Car extends GameObject {
     return this.linkedEngine.getVision(this, this.VISION_RAYS, this.FIELD_OF_VISION, this.RENDER_DISTANCE);
   }
 
-  /*
-   * Requests vision from engine and returns array
-   */
-  see = function() {
-    return this.linkedEngine.getVision(this, this.VISION_RAYS, this.FIELD_OF_VISION, this.RENDER_DISTANCE);
-  }
+  onCollision = function(e) {
+    console.log(this.eventName + " Collided with " + e.hitObject.label);
 
+    if (e.hitObject.label == "Goal") {
+      this.memory.reachedGoal = true;
+    }
+    else {
+      this.memory.collided = true;
+      this.memory.addCollidedObject(e.hitObject);
+      this.memory.isStuck = true;
+    }
+  }
   // onCollision = function() {
   //   let collidings = *collidingItems*; // all gameobjects that are colliding with the car
   //   if (goal is in colliding) {

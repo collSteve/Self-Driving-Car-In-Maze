@@ -45,11 +45,13 @@ class CarState {
   async run() {
     // do sth
     console.log("Running "+ this.stateName + this.gameObject.eventName);
+    this.gameObject.memory.stateInfo.currentState = this.stateName;
 
+    let dataOut = this.generateDataOut();
 
-    //return dataOut;
+    this.gameObject.memory.stateInfo.nextState = dataOut.nextState;
 
-    return this.generateDataOut();
+    return dataOut;
   }
 
   setInput = function(dataIn) {
@@ -69,6 +71,7 @@ class VisionState extends CarState {
   async run() {
     // To-Do: see
     console.log("Running "+ this.stateName + this.gameObject.eventName);
+    this.gameObject.memory.stateInfo.currentState = this.stateName;
 
     await sleep(1000);
 
@@ -78,7 +81,7 @@ class VisionState extends CarState {
     // store vision
     vision.forEach((item, i) => {
       if (item.obstacle == "Wall") {
-        this.gameObject.memory.obstacleHitPoints.push(deepCopy(item));
+        this.gameObject.memory.addObstacleHitPoint(deepCopy(item));
       }
     });
 
@@ -90,6 +93,8 @@ class VisionState extends CarState {
     dataOut.previousState = this.stateName;
     dataOut.nextState = this.stateOut.S0;
     dataOut.vision = vision;
+
+    this.gameObject.memory.stateInfo.nextState = dataOut.nextState;
 
     return dataOut;
   }
@@ -111,6 +116,7 @@ class ThinkState extends CarState {
 
     // To-Do: think
     console.log("Running "+ this.stateName + this.gameObject.eventName);
+    this.gameObject.memory.stateInfo.currentState = this.stateName;
 
     let demands = {};
 
@@ -125,6 +131,9 @@ class ThinkState extends CarState {
     debugObj.push({type:"point", pos:{x:demands.motionDemands.nextTargetPoint.x,
                                       y:demands.motionDemands.nextTargetPoint.y}});
 
+    // store demands to memory
+    this.gameObject.memory.brainDemand = demands;
+
     // output construct
     let dataOut = deepCopy(this.dataIn); // deep copy
 
@@ -134,6 +143,7 @@ class ThinkState extends CarState {
 
     await sleep(5000);
 
+    this.gameObject.memory.stateInfo.nextState = dataOut.nextState;
     return dataOut;
   }
 }
@@ -152,9 +162,11 @@ class TurningMotionState extends CarState {
   async run() {
     // To-Do: think
     console.log("Running "+ this.stateName + this.gameObject.eventName);
+    this.gameObject.memory.stateInfo.currentState = this.stateName;
+
 
     // data processing
-    let demands = deepCopy(this.dataIn.brainDemands);
+    let demands = deepCopy(this.gameObject.memory.brainDemand);
     let motionDemands = demands.motionDemands;
     let nextTargetPoint = motionDemands.nextTargetPoint;
 
@@ -187,6 +199,7 @@ class TurningMotionState extends CarState {
     dataOut.movementData = movementData;
 
     await sleep(this.dataIn.deltaTime);
+    this.gameObject.memory.stateInfo.nextState = dataOut.nextState;
 
     return dataOut;
   }
@@ -213,6 +226,7 @@ class TranslationMotionState extends CarState {
       //console.log(this.gameObject.body.speed/this.gameObject.body.frictionAir, "<", realSpeed - this.stuckSpeedRange);
 
       this.gameObject.stop();
+      this.gameObject.memory.isStuck = false;
     }
     else if (reachedTarget) {
       this.gameObject.stop();
@@ -230,6 +244,7 @@ class TranslationMotionState extends CarState {
   async run() {
     // To-Do: see
     console.log("Running "+ this.stateName + this.gameObject.eventName);
+    this.gameObject.memory.stateInfo.currentState = this.stateName;
 
     // data processing
     let previousPosition, previousSpeed;
@@ -272,7 +287,8 @@ class TranslationMotionState extends CarState {
     let currTime = Date.now();
 
     // To-Do: change isStuck logic
-    let isStuck = this.gameObject.body.speed / this.gameObject.body.frictionAir < realSpeed - this.stuckSpeedRange;
+    //let isStuck = this.gameObject.body.speed / this.gameObject.body.frictionAir < realSpeed - this.stuckSpeedRange;
+    let isStuck = this.gameObject.memory.isStuck;
     let reachedTarget = targetDistanceDiff < this.distanceError;
 
     let nextState = this.decideNextState(isStuck, reachedTarget);
@@ -280,11 +296,10 @@ class TranslationMotionState extends CarState {
     dataOut.nextState = nextState;
 
     // store Memory
-    this.gameObject.memory.previousPosition = deepCopy(currentPos);
-    this.gameObject.memory.previousPositions.push(deepCopy(currentPos));
-
+    this.gameObject.memory.addPreviousPosition(currentPos);
     dataOut.previousState = this.stateName;
 
+    this.gameObject.memory.stateInfo.nextState = dataOut.nextState;
     return dataOut;
   }
 }

@@ -16,6 +16,9 @@ function setup() {
 
   GameEngine.addGameObject(GameCar);
   //GameEngine.addGameObject(GameCar2);
+
+  // start all car
+  GameEngine.runAllCars();
 }
 
 function draw() {

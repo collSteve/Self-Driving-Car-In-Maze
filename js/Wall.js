@@ -16,6 +16,8 @@ class Wall extends GameObject{
     this.body = Matter.Bodies.rectangle(this.position.x,this.position.y, width, height, {isStatic:true});
     this.body.label = "Wall";
     this.setRotation(rotation);
+
+    this.bodyBinding();
   }
 
   setSize = function(width, height) {
