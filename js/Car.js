@@ -24,6 +24,19 @@ class Car extends GameObject {
     "TranslationMotionState" : new TranslationMotionState(this)
   };
 
+  setCarStateNextState = function(stateName, targetType, targetStateName) {
+    let initialState = this.States.stateName.stateOut.targetType;
+    if (typeof initialState === 'undefined') {
+      console.log("[Connect State Failed] State " + stateName + " does not have connector to "+targetType);
+    }
+    else if (typeof this.States.targetStateName === 'undefined') {
+      console.log("[Connect State Failed] " + this.tage + " does not support " + targetStateName);
+    }
+    else {
+      this.States.stateName.stateOut.targetType = targetStateName;
+    }
+  }
+
   constructor(pos, width=0, height=0, rotation=0) {
     super();
     this.position = pos.copy();
