@@ -20,38 +20,50 @@ data =
   movementData:
 }
 */
+// TO-DO: update state's constructors
+let debugObj = [];
 
 class CarState {
   stateName = "Abstract State";
   previousState = null;
   dataIn = null;
 
+  stateIn = {};
+  stateOut = {
+    S0:"VisionState"
+  };
+
   gameObject = null;
+
+  nextState = null;
 
   constructor(gameObject) {
     this.gameObject = gameObject;
   }
 
+  generateDataOut = function() {
+    // output construct
+    let dataOut = deepCopy(this.dataIn); // deep copy
+
+    dataOut.previousState = this.stateName;
+    dataOut.nextState = this.stateOut.S0; // loop back: change later
+    return dataOut;
+  }
+
   async run() {
     // do sth
     console.log("Running "+ this.stateName + this.gameObject.eventName);
+    this.gameObject.memory.stateInfo.currentState = this.stateName;
 
-    // output construct
-    let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
+    let dataOut = this.generateDataOut();
 
-    dataOut["previousState"] = this.stateName;
-    dataOut["nextSate"] = "Abstract State"; // loop back: change later
-    //return dataOut;
+    this.gameObject.memory.stateInfo.nextState = dataOut.nextState;
 
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(dataOut);
-      }, 5000); // take 5s to return
-    });
+    return dataOut;
   }
 
   setInput = function(dataIn) {
-    this.dataIn = JSON.parse(JSON.stringify(dataIn)); // deep copy
+    this.dataIn = deepCopy(dataIn); // deep copy
     this.previousState = dataIn["previousState"];
   }
 }
@@ -60,22 +72,36 @@ class VisionState extends CarState {
   constructor(gameObject) {
     super(gameObject);
     this.stateName = "VisionState";
+
+    this.stateOut.S0 = "ThinkState";
   }
 
   async run() {
     // To-Do: see
     console.log("Running "+ this.stateName + this.gameObject.eventName);
+    this.gameObject.memory.stateInfo.currentState = this.stateName;
 
     await sleep(1000);
 
     let vision = this.gameObject.see();
 
+    // store vision
+    vision.forEach((item, i) => {
+      if (item.obstacle == "Wall") {
+        this.gameObject.memory.addObstacleHitPoint(deepCopy(item));
+      }
+    });
+
+    this.gameObject.memory.vision = deepCopy(vision);
+
     // output construct
-    let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
+    let dataOut = deepCopy(this.dataIn); // deep copy
 
     dataOut.previousState = this.stateName;
-    dataOut.nextState = "ThinkState";
+    dataOut.nextState = this.stateOut.S0;
     dataOut.vision = vision;
+
+    this.gameObject.memory.stateInfo.nextState = dataOut.nextState;
 
     return dataOut;
   }
@@ -86,6 +112,9 @@ class ThinkState extends CarState {
   constructor(gameObject) {
     super(gameObject);
     this.stateName = "ThinkState";
+
+    this.stateOut.MotionState = "TurningMotionState";
+    this.stateOut.GoalState = null;
   }
 
   async run() {
@@ -94,26 +123,34 @@ class ThinkState extends CarState {
 
     // To-Do: think
     console.log("Running "+ this.stateName + this.gameObject.eventName);
+    this.gameObject.memory.stateInfo.currentState = this.stateName;
 
     let demands = {};
 
     // sample data
     demands.motionDemands = {
-      // nextTargetPoint: {x: currentPos.x + randomNum(-40,40),
-      //                   y:currentPos.y + randomNum(-40,40)}
-      nextTargetPoint: {x: currentPos.x ,
-                        y:currentPos.y - 50}
+      nextTargetPoint: {x: currentPos.x + randomNum(-50,50),
+                        y:currentPos.y + randomNum(-50,50)}
+      // nextTargetPoint: {x: currentPos.x ,
+      //                   y:currentPos.y - 50}
     };
 
+    debugObj.push({type:"point", pos:{x:demands.motionDemands.nextTargetPoint.x,
+                                      y:demands.motionDemands.nextTargetPoint.y}});
+
+    // store demands to memory
+    this.gameObject.memory.brainDemand = demands;
+
     // output construct
-    let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
+    let dataOut = deepCopy(this.dataIn); // deep copy
 
     dataOut.previousState = this.stateName;
-    dataOut.nextState = "TurningMotionState";
+    dataOut.nextState = this.stateOut.MotionState;
     dataOut.brainDemands = demands;
 
     await sleep(5000);
 
+    this.gameObject.memory.stateInfo.nextState = dataOut.nextState;
     return dataOut;
   }
 }
@@ -124,14 +161,19 @@ class TurningMotionState extends CarState {
     this.stateName = "TurningMotionState";
 
     this.turningError = 0.1;
+
+    this.stateOut.TranslationMotionState = "TranslationMotionState";
+    this.stateOut.TurningMotionState = "TurningMotionState";
   }
 
   async run() {
     // To-Do: think
     console.log("Running "+ this.stateName + this.gameObject.eventName);
+    this.gameObject.memory.stateInfo.currentState = this.stateName;
+
 
     // data processing
-    let demands = JSON.parse(JSON.stringify(this.dataIn.brainDemands));
+    let demands = deepCopy(this.gameObject.memory.brainDemand);
     let motionDemands = demands.motionDemands;
     let nextTargetPoint = motionDemands.nextTargetPoint;
 
@@ -149,21 +191,22 @@ class TurningMotionState extends CarState {
 
     // output construct
     let movementData = {};
-    let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
+    let dataOut = deepCopy(this.dataIn); // deep copy
 
     dataOut.previousState = this.stateName;
 
     // figure out the next state
     if (angleWithinError) {
-      dataOut.nextState = "TranslationMotionState";
+      dataOut.nextState = this.stateOut.TranslationMotionState;
     }
     else {
-      dataOut.nextState = "TurningMotionState";
+      dataOut.nextState = this.stateOut.TurningMotionState;
     }
 
     dataOut.movementData = movementData;
 
     await sleep(this.dataIn.deltaTime);
+    this.gameObject.memory.stateInfo.nextState = dataOut.nextState;
 
     return dataOut;
   }
@@ -175,11 +218,40 @@ class TranslationMotionState extends CarState {
     this.stateName = "TranslationMotionState";
     this.distanceError = 5;
     this.stuckTimeRange = 10/1000;
+    this.stuckSpeedRange = 0.1;
+
+    this.stateOut.TurningMotionState = "TurningMotionState";
+    this.stateOut.VisionState = "VisionState";
+  }
+
+  decideNextState = function(isStuck, reachedTarget) {
+    let nextState = null;
+    if (isStuck) {
+      nextState = this.stateOut.VisionState;
+
+      console.log("Stucked");
+      //console.log(this.gameObject.body.speed/this.gameObject.body.frictionAir, "<", realSpeed - this.stuckSpeedRange);
+
+      this.gameObject.stop();
+      this.gameObject.memory.isStuck = false;
+    }
+    else if (reachedTarget) {
+      this.gameObject.stop();
+      nextState = this.stateOut.VisionState;
+    }
+    else {
+      nextState = this.stateOut.TurningMotionState;
+
+      // console.log(this.gameObject.body.speed/this.gameObject.body.frictionAir, "vs", realSpeed - this.stuckSpeedRange);
+      // console.log(currentPos, beforeMovePosition);
+    }
+    return nextState;
   }
 
   async run() {
     // To-Do: see
     console.log("Running "+ this.stateName + this.gameObject.eventName);
+    this.gameObject.memory.stateInfo.currentState = this.stateName;
 
     // data processing
     let previousPosition, previousSpeed;
@@ -187,17 +259,17 @@ class TranslationMotionState extends CarState {
       previousPosition = {x:this.gameObject.startPosition.x,y:this.gameObject.startPosition.y};
     }
     else {
-      previousPosition = JSON.parse(JSON.stringify(this.dataIn.previousPosition));
+      previousPosition = deepCopy(this.dataIn.previousPosition);
     }
 
     if (!this.dataIn.previousSpeed){
       previousSpeed = 0;
     }
     else {
-      previousSpeed = JSON.parse(JSON.stringify(this.dataIn.previousSpeed));
+      previousSpeed = deepCopy(this.dataIn.previousSpeed);
     }
 
-    let demands = JSON.parse(JSON.stringify(this.dataIn.brainDemands));
+    let demands = deepCopy(this.dataIn.brainDemands);
     let motionDemands = demands.motionDemands;
     let nextTargetPoint = motionDemands.nextTargetPoint;
     let pos =this.gameObject.body.position;
@@ -206,8 +278,8 @@ class TranslationMotionState extends CarState {
     let beforeMovePosition = {x:this.gameObject.body.position.x,y:this.gameObject.body.position.y};
     let beforeTime = Date.now();
 
-    let speed = Math.sqrt(Math.pow(nextTargetPoint.x-pos.x,2) + Math.pow(nextTargetPoint.y-pos.y,2)); // need changing
-    this.gameObject.move(speed, this.dataIn.deltaTime);
+    let speed = dist2D(nextTargetPoint, beforeMovePosition); // need changing
+    let realSpeed = this.gameObject.move(speed, this.dataIn.deltaTime).speed;
 
     await sleep(this.dataIn.deltaTime); // move for this amount of time
 
@@ -217,32 +289,24 @@ class TranslationMotionState extends CarState {
     let movedDistance = dist2D(currentPos, beforeMovePosition);
 
     // output construct
-    let dataOut = JSON.parse(JSON.stringify(this.dataIn)); // deep copy
+    let dataOut = deepCopy(this.dataIn); // deep copy
 
     let currTime = Date.now();
-    let realSpeed = speed/(this.dataIn.engineTime);
 
-    if (movedDistance < realSpeed * (currTime - beforeTime)/1000) {
-      this.gameObject.stop();
-      dataOut.nextState = "VisionState";
+    // To-Do: change isStuck logic
+    //let isStuck = this.gameObject.body.speed / this.gameObject.body.frictionAir < realSpeed - this.stuckSpeedRange;
+    let isStuck = this.gameObject.memory.isStuck;
+    let reachedTarget = targetDistanceDiff < this.distanceError;
 
-      console.log("Stucked", currTime - beforeTime);
-      console.log(movedDistance, "<", realSpeed * (currTime - beforeTime));
+    let nextState = this.decideNextState(isStuck, reachedTarget);
 
-      speed = 0;
-    }
+    dataOut.nextState = nextState;
 
-    else if (targetDistanceDiff < this.distanceError) {
-      this.gameObject.stop();
-      dataOut.nextState = "VisionState";
-      speed = 0;
-    }
-    else {
-      dataOut.nextState = "TurningMotionState";
-    }
-
+    // store Memory
+    this.gameObject.memory.addPreviousPosition(currentPos);
     dataOut.previousState = this.stateName;
 
+    this.gameObject.memory.stateInfo.nextState = dataOut.nextState;
     return dataOut;
   }
 }

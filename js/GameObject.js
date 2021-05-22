@@ -15,6 +15,7 @@ const MotionType = {
 
 // dependence: P5.js Vector
 class GameObject {
+  running = false;
   position = createVector(0,0);
   rotation = 0;
 
@@ -32,6 +33,10 @@ class GameObject {
 
   // physics body (matter.js)
   body = Matter.Bodies.rectangle(this.position.x,this.position.y, this.sprite.size.width, this.sprite.size.height);
+
+  bodyBinding = function() {
+    this.body.gameObject = this;
+  }
 
   // newPos is a vector
   moveTo = function(newPos) {
@@ -71,6 +76,10 @@ class GameObject {
   }
 
   update = function(deltaTime) {
+
+  }
+
+  onCollision = function(e) {
 
   }
 }

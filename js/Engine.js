@@ -26,10 +26,24 @@ class Engine {
      gameMaze.maze.forEach((wall, i) => {
        this.addGameObject(wall);
      });
+
+     // set up collision event for gameobjects
+     Matter.Events.on(this.physicsEngine, "collisionActive", function (event) {
+       let pairs = event.pairs;
+       let collidedBodyIDs = new Set();
+       pairs.forEach((item, i) => {
+          let bodyA = item.bodyA;
+          let bodyB = item.bodyB;
+
+          bodyA.gameObject.onCollision({hitObject:bodyB});
+          bodyB.gameObject.onCollision({hitObject:bodyA});
+
+       });
+     });
   }
 
   run = function(deltaTime) {
-
+    this.displayDebugObjects(debugObj);
     this.displayGameObjects(this.gameObjects);
 
   }
@@ -65,6 +79,18 @@ class Engine {
         drawArrow(pos,p5.Vector.mult(item.headingDirection,20),"red");
       }
     });
+
+    // debug
+
+  }
+
+  displayDebugObjects = function(objects) {
+    push();
+    objects.forEach((item, i) => {
+      strokeWeight(5);
+      point(item.pos.x,item.pos.y);
+    });
+    pop();
   }
 
   updateObjects = function(objects, deltaTime) {
@@ -84,7 +110,26 @@ class Engine {
     if (obj.tag == "Car") {
       obj.setLinkedEngine(this);
     }
+  }
 
+  runAllCars = function() {
+    this.gameObjects.forEach((item, i) => {
+      if (item.tag == "Car") {
+        item.running = true;
+        // fire runState Event using stateInfo in its memory
+        let eventArg = {dataIn:deepCopy(item.memory.stateInfo.stateDataOut)};
+        EventDispatcher.emit(item.eventName, eventArg);
+      }
+    });
+  }
+
+  stopAllCars = function() {
+    this.gameObjects.forEach((item, i) => {
+      if (item.tag == "Car") {
+        item.stop();
+        item.running = false;
+      }
+    });
   }
 
   /*
