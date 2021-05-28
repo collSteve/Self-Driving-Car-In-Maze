@@ -38,7 +38,7 @@ class Car extends GameObject {
       console.log("[Connect State Failed] State " + stateName + " does not have connector to "+targetType);
     }
     else if (typeof this.States.targetStateName === 'undefined') {
-      console.log("[Connect State Failed] " + this.tage + " does not support " + targetStateName);
+      console.log("[Connect State Failed] " + this.tag + " does not support " + targetStateName);
     }
     else {
       this.States.stateName.stateOut.targetType = targetStateName;

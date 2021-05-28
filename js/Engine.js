@@ -240,26 +240,31 @@ class Engine {
       //Find closest intersection
       if (lineCols.length > 0) {
         let closestCol = {
-          pos: Matter.Vector.sub(lineCols[0], obj.position),
+          relative: Matter.Vector.sub(lineCols[0], obj.position),
+          global: {
+            x: lineCols[0].x,
+            y: lineCols[0].y
+          },
           obstacle: lineCols[0].obstacle
         }
-        let closestColDistanceSq = Math.pow(closestCol.pos.x, 2) + Math.pow(closestCol.pos.y, 2);
-        lineCols.forEach(collision => {
+        let closestColDistanceSq = Matter.Vector.magnitudeSquared(closestCol.relative);
+        for (let j = 1; j < lineCols.length; j++) {
+          let collision = lineCols[j];
           let currCol = {
-            pos: Matter.Vector.sub(collision, obj.position),
+            relative: Matter.Vector.sub(collision, obj.position),
+            global: {
+              x: collision.x,
+              y: collision.y
+            },
             obstacle: collision.obstacle
           }
-          let currColDistanceSq = Math.pow(currCol.pos.x, 2) + Math.pow(currCol.pos.y, 2);
+          let currColDistanceSq = Matter.Vector.magnitudeSquared(currCol.relative);
           if ((currColDistanceSq + ERROR) < closestColDistanceSq) {
             closestCol = currCol;
             closestColDistanceSq = currColDistanceSq;
           }
-        });
-        vision.push({
-          x: closestCol.pos.x,
-          y: closestCol.pos.y,
-          obstacle: closestCol.obstacle
-        });
+        }
+        vision.push(closestCol);
       }
 
       currRay = Matter.Vector.rotate(currRay, raySeparationAngle); //next ray
