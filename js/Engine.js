@@ -112,10 +112,11 @@ class Engine {
     }
   }
 
-  runAllCars = function() {
+  runAllCars = function(goal) {
     this.gameObjects.forEach((item, i) => {
       if (item.tag == "Car") {
         item.running = true;
+        item.setGoal(goal);
         // fire runState Event using stateInfo in its memory
         let eventArg = {dataIn:deepCopy(item.memory.stateInfo.stateDataOut)};
         EventDispatcher.emit(item.eventName, eventArg);

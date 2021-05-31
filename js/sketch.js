@@ -24,8 +24,11 @@ function setup() {
   GameEngine.addGameObject(GameCar);
   //GameEngine.addGameObject(GameCar2);
 
+  GameGoal = new Goal(createVector(250, 250), 15);
+  GameEngine.addGameObject(GameGoal);
+
   // start all car
-  GameEngine.runAllCars();
+  GameEngine.runAllCars(GameGoal);
 }
 
 function draw() {

@@ -118,6 +118,10 @@ class Car extends GameObject {
       this.linkedEngine = engine;
   }
 
+  setGoal = function(goal) {
+    this.memory.goalObjects.push(goal);
+  }
+
   async runState(e) {
 
     let dataIn = e.dataIn;
